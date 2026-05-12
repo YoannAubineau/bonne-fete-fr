@@ -19,8 +19,8 @@ MIN_START_YEAR = 1950
 FROZEN_DTSTAMP = "19500101T000000Z"
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ICS_PATH = PROJECT_ROOT / "artefacts" / "bonne-fete-fr.ics"
-HTML_PATH = PROJECT_ROOT / "artefacts" / "index.html"
+ICS_PATH = PROJECT_ROOT / "docs" / "bonne-fete-fr.ics"
+HTML_PATH = PROJECT_ROOT / "docs" / "index.html"
 TEMPLATE_PATH = PROJECT_ROOT / "src" / "index-template.html"
 
 
