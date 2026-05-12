@@ -69,5 +69,5 @@ CASES = [
 
 
 @pytest.mark.parametrize(("fn", "year", "expected"), CASES)
-def test_holiday_date(fn, year, expected):
+def test_celebration_date(fn, year, expected):
     assert fn(year) == expected
