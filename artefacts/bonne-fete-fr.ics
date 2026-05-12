@@ -1,12 +1,12 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Bonne Fete//Calendrier des fetes affectives FR//FR
+PRODID:-//Bonne Fete//Calendrier des fetes relationnelles//FR
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 X-WR-CALNAME:Bonne Fête (France)
-X-WR-CALDESC:Dates annuelles des fêtes affectives en France : Saint-Valent
- in\, fêtes des mères\, pères\, grands-mères\, grands-pères\, et Journ
- ée mondiale des grands-parents.
+X-WR-CALDESC:Dates annuelles des fêtes relationnelles en France : Saint-Va
+ lentin\, fêtes des mères\, pères\, grands-mères\, grands-pères\, et J
+ ournée mondiale des grands-parents.
 X-WR-TIMEZONE:Europe/Paris
 BEGIN:VEVENT
 UID:saint-valentin-1950@bonne-fete-fr

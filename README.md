@@ -4,7 +4,7 @@
 [![update-calendar](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml/badge.svg)](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml)
 ![Calendar updated](https://img.shields.io/github/last-commit/YoannAubineau/bonne-fete-fr?path=artefacts%2Fbonne-fete-fr.ics&label=calendar%20updated&color=007ec6)
 
-A free public iCalendar (`.ics`) feed for the six affective celebrations observed in France: *Saint-Valentin*, *Fête des Mères*, *Fête des Pères*, *Fête des Grands-Mères*, *Fête des Grands-Pères*, and *Journée mondiale des grands-parents*. Each year's dates are computed from the legal and conventional rules (including the *Pentecôte* exception for *Fête des Mères*) and can be added to Google Calendar, Apple Calendar, or Outlook in a single click.
+A free public iCalendar (`.ics`) feed for the six relational observances observed in France: *Saint-Valentin*, *Fête des Mères*, *Fête des Pères*, *Fête des Grands-Mères*, *Fête des Grands-Pères*, and *Journée mondiale des grands-parents*. Each year's dates are computed from the legal and conventional rules (including the *Pentecôte* exception for *Fête des Mères*) and can be added to Google Calendar, Apple Calendar, or Outlook in a single click.
 
 ## Next dates (auto-updated)
 
@@ -25,6 +25,6 @@ Once added, the dates appear in your calendar automatically, every year.
 
 ## Why?
 
-French affective celebrations follow precise but disorienting rules. *Fête des Mères* falls on the last Sunday of May, *except* when it coincides with *Pentecôte*, in which case it moves to the first Sunday of June (2023, 2034, 2045, …). The very first *Fête des Grands-Mères* was celebrated on Saturday, March 28, 1987, before the celebration settled on the first Sunday of March.
+French relational observances follow precise but disorienting rules. *Fête des Mères* falls on the last Sunday of May, *except* when it coincides with *Pentecôte*, in which case it moves to the first Sunday of June (2023, 2034, 2045, …). The very first *Fête des Grands-Mères* was celebrated on Saturday, March 28, 1987, before it settled on the first Sunday of March.
 
 This calendar follows those rules to the letter, preserves historical dates as they were actually celebrated, covers the next 30 years, and automatically extends by one more year every January 1st.
