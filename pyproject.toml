@@ -29,7 +29,6 @@ src = ["src"]
 select = ["ALL"]
 ignore = [
     "C901",    # function is too complex
-    "E741",    # ambiguous variable name (e.g. `l`)
     "E501",    # line too long
     "PERF401", # manual list comprehension (use `list.extend`)
     "PLR0912", # too many branches
