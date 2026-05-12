@@ -1,7 +1,5 @@
 """Strict RFC 5545 validation of the generated .ics file."""
 
-from __future__ import annotations
-
 import sys
 from datetime import date as date_cls
 from datetime import datetime

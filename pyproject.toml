@@ -3,7 +3,7 @@ name = "bonne-fete-fr"
 version = "0.1.0"
 description = "Public iCalendar feed for the French relational observances"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.14"
 license = { file = "LICENSE" }
 dependencies = [
     "icalendar>=6.0",
@@ -21,7 +21,7 @@ python_files = ["tests.py", "test_*.py"]
 pythonpath = ["src"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py314"
 line-length = 100
 src = ["src"]
 

@@ -1,7 +1,5 @@
 """Generate the .ics calendar."""
 
-from __future__ import annotations
-
 import sys
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
