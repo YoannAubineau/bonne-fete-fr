@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import sys
-from datetime import date as date_cls, datetime
+from datetime import date as date_cls
+from datetime import datetime
 from pathlib import Path
 
 from icalendar import Calendar
@@ -22,7 +23,7 @@ def _year_of(value: object) -> int | None:
     return None
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each branch reports a distinct problem.
     if not ICS_PATH.exists():
         print(f"✗ file not found: {ICS_PATH}")
         return 1
@@ -57,16 +58,17 @@ def main() -> int:
         uid_str = str(uid) if uid is not None else f"<event #{count}>"
         if uid is None:
             problems.append(f"{uid_str}: UID missing")
+        elif uid_str in uids:
+            duplicates.append(uid_str)
+            problems.append(f"duplicate UID: {uid_str}")
         else:
-            if uid_str in uids:
-                duplicates.append(uid_str)
-                problems.append(f"duplicate UID: {uid_str}")
-            else:
-                uids.add(uid_str)
+            uids.add(uid_str)
 
-        for prop in ("summary", "dtstart", "dtend", "sequence", "dtstamp"):
-            if component.get(prop) is None:
-                problems.append(f"{uid_str}: property {prop.upper()} missing")
+        problems.extend(
+            f"{uid_str}: property {prop.upper()} missing"
+            for prop in ("summary", "dtstart", "dtend", "sequence", "dtstamp")
+            if component.get(prop) is None
+        )
 
         dtstart = component.get("dtstart")
         dtend = component.get("dtend")

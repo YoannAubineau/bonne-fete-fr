@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import json
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import quote
+from zoneinfo import ZoneInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # --- Configuration ---
 
@@ -29,6 +33,7 @@ README_NEXT_DATES_END = "<!-- END: next-dates -->"
 
 # --- Date helpers ---
 
+
 def easter(year: int) -> date:
     """Easter Sunday via the Meeus/Jones/Butcher Gregorian computus."""
     a = year % 19
@@ -41,7 +46,7 @@ def easter(year: int) -> date:
     h = (19 * a + b - d - g + 15) % 30
     i = c // 4
     k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7
+    l = (32 + 2 * e + 2 * i - h - k) % 7  # noqa: E741 — variable names match Meeus's published formula.
     m = (a + 11 * h + 22 * l) // 451
     month = (h + l - 7 * m + 114) // 31
     day = ((h + l - 7 * m + 114) % 31) + 1
@@ -51,10 +56,7 @@ def easter(year: int) -> date:
 def nth_sunday(year: int, month: int, n: int) -> date:
     """Return the n-th Sunday of the month. n in {1, 2, 3, 4, -1 (last)}."""
     if n == -1:
-        if month == 12:
-            last = date(year, 12, 31)
-        else:
-            last = date(year, month + 1, 1) - timedelta(days=1)
+        last = date(year, 12, 31) if month == 12 else date(year, month + 1, 1) - timedelta(days=1)
         # weekday(): Monday=0, Sunday=6
         offset_back = (last.weekday() - 6) % 7
         return last - timedelta(days=offset_back)
@@ -67,6 +69,7 @@ def nth_sunday(year: int, month: int, n: int) -> date:
 
 
 # --- Holiday rules ---
+
 
 def valentines_day(year: int) -> date:
     return date(year, 2, 14)
@@ -101,6 +104,7 @@ def grandfathers_day(year: int) -> date:
 
 # --- Holiday catalog ---
 
+
 @dataclass(frozen=True)
 class Holiday:
     # `key` is part of the immutable UID — never change it.
@@ -113,27 +117,48 @@ class Holiday:
 
 HOLIDAYS: list[Holiday] = [
     Holiday(
-        "saint-valentin", "Saint-Valentin", 1950, valentines_day,
+        "saint-valentin",
+        "Saint-Valentin",
+        1950,
+        valentines_day,
         "Saint-Valentin — fête des amoureux (14 février).",
     ),
     Holiday(
-        "grands-meres", "Fête des Grands-Mères", 1987, grandmothers_day,
+        "grands-meres",
+        "Fête des Grands-Mères",
+        1987,
+        grandmothers_day,
         "Fête des Grands-Mères — 1ᵉʳ dimanche de mars.",
     ),
     Holiday(
-        "meres", "Fête des Mères", 1950, mothers_day,
-        "Fête des Mères — dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
+        "meres",
+        "Fête des Mères",
+        1950,
+        mothers_day,
+        (
+            "Fête des Mères — dernier dimanche de mai, "
+            "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
+        ),
     ),
     Holiday(
-        "peres", "Fête des Pères", 1952, fathers_day,
+        "peres",
+        "Fête des Pères",
+        1952,
+        fathers_day,
         "Fête des Pères — 3ᵉ dimanche de juin.",
     ),
     Holiday(
-        "grands-parents", "Journée mondiale des grands-parents", 2021, grandparents_day,
+        "grands-parents",
+        "Journée mondiale des grands-parents",
+        2021,
+        grandparents_day,
         "Journée mondiale des grands-parents — 4ᵉ dimanche de juillet.",
     ),
     Holiday(
-        "grands-peres", "Fête des Grands-Pères", 2008, grandfathers_day,
+        "grands-peres",
+        "Fête des Grands-Pères",
+        2008,
+        grandfathers_day,
         "Fête des Grands-Pères — 1ᵉʳ dimanche d'octobre.",
     ),
 ]
@@ -161,12 +186,7 @@ CALENDAR_FOOTER = ["END:VCALENDAR"]
 
 def escape_ical_text(s: str) -> str:
     """Escape an iCalendar TEXT value (RFC 5545 §3.3.11)."""
-    return (
-        s.replace("\\", "\\\\")
-        .replace(";", "\\;")
-        .replace(",", "\\,")
-        .replace("\n", "\\n")
-    )
+    return s.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
 
 
 def vevent_lines(holiday: Holiday, year: int, event_date: date, sequence: int) -> list[str]:
@@ -188,10 +208,7 @@ def vevent_lines(holiday: Holiday, year: int, event_date: date, sequence: int) -
 
 def significant_lines(lines: list[str]) -> list[str]:
     """Lines that count for change detection (everything except DTSTAMP and SEQUENCE)."""
-    return [
-        ln for ln in lines
-        if not ln.startswith("DTSTAMP") and not ln.startswith("SEQUENCE")
-    ]
+    return [ln for ln in lines if not ln.startswith("DTSTAMP") and not ln.startswith("SEQUENCE")]
 
 
 def fold_line(line: str, max_octets: int = 75) -> str:
@@ -217,6 +234,7 @@ def fold_line(line: str, max_octets: int = 75) -> str:
 
 # --- Read previous .ics (date preservation + SEQUENCE tracking) ---
 
+
 @dataclass
 class PreviousEvent:
     event_date: date
@@ -231,7 +249,7 @@ def _unfold(text: str) -> list[str]:
     return unfolded.split("\n")
 
 
-def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
+def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 — single-pass RFC 5545 parser; splitting would obscure block-state logic.
     if not path.exists():
         return {}
     text = path.read_text(encoding="utf-8")
@@ -254,7 +272,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
         dtstart_line = next((b for b in block if b.startswith("DTSTART")), None)
         if uid_line is None or dtstart_line is None:
             continue
-        uid = uid_line[len("UID:"):]
+        uid = uid_line[len("UID:") :]
         if not uid.endswith("@bonne-fete-fr"):
             continue
         base = uid[: -len("@bonne-fete-fr")]
@@ -263,7 +281,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
             continue
         key = base[:sep]
         try:
-            year = int(base[sep + 1:])
+            year = int(base[sep + 1 :])
         except ValueError:
             continue
         dt_value = dtstart_line.split(":", 1)[1]
@@ -275,7 +293,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
         seq = 0
         if seq_line is not None:
             try:
-                seq = int(seq_line[len("SEQUENCE:"):])
+                seq = int(seq_line[len("SEQUENCE:") :])
             except ValueError:
                 seq = 0
         previous[(key, year)] = PreviousEvent(
@@ -288,7 +306,10 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
 
 # --- Build VEVENTs ---
 
-def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) -> list[tuple[date, list[str]]]:
+
+def build_events(
+    today: date, previous: dict[tuple[str, int], PreviousEvent]
+) -> list[tuple[date, list[str]]]:
     """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
@@ -297,10 +318,7 @@ def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) ->
             computed = holiday.rule(year)
             prev = previous.get((holiday.key, year))
             # Past events keep their historical date — never rewrite history.
-            if prev is not None and computed < today:
-                event_date = prev.event_date
-            else:
-                event_date = computed
+            event_date = prev.event_date if prev is not None and computed < today else computed
             candidate = vevent_lines(holiday, year, event_date, sequence=0)
             candidate_sig = significant_lines(candidate)
             if prev is None:
@@ -337,19 +355,51 @@ def write_ics(today: date) -> int:
 # --- index.html generation ---
 
 FR_WEEKDAYS = [
-    "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche",
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+    "dimanche",
 ]
 FR_MONTHS = [
-    "janvier", "février", "mars", "avril", "mai", "juin",
-    "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
 ]
 
 EN_WEEKDAYS = [
-    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
 ]
 EN_MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
 ]
 
 
@@ -392,10 +442,7 @@ def render_next_dates_html(today: date) -> str:
 
 def render_next_dates_markdown(today: date) -> str:
     rows = next_occurrences(today)
-    lines = [
-        f"- **{holiday.name}** — {format_english_date(d)}"
-        for holiday, d in rows
-    ]
+    lines = [f"- **{holiday.name}** — {format_english_date(d)}" for holiday, d in rows]
     return "\n".join(lines)
 
 
@@ -426,15 +473,16 @@ def counter_script() -> str:
 
 def write_html(today: date) -> None:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
-    gcal_url = "https://calendar.google.com/calendar/r/settings/addbyurl?url=" + quote(PUBLIC_URL, safe="")
+    gcal_url = "https://calendar.google.com/calendar/r/settings/addbyurl?url=" + quote(
+        PUBLIC_URL, safe=""
+    )
     webcal_url = PUBLIC_URL
     for scheme in ("https://", "http://"):
         if webcal_url.startswith(scheme):
-            webcal_url = "webcal://" + webcal_url[len(scheme):]
+            webcal_url = "webcal://" + webcal_url[len(scheme) :]
             break
     html = (
-        template
-        .replace("{{NEXT_DATES}}", render_next_dates_html(today))
+        template.replace("{{NEXT_DATES}}", render_next_dates_html(today))
         .replace("{{GCAL_URL}}", gcal_url)
         .replace("{{WEBCAL_URL}}", webcal_url)
         .replace("{{ICS_URL}}", PUBLIC_URL)
@@ -453,7 +501,7 @@ def write_readme(today: date) -> None:
 
 
 def main() -> int:
-    today = date.today()
+    today = datetime.now(tz=ZoneInfo("Europe/Paris")).date()
     n = write_ics(today)
     write_html(today)
     write_readme(today)

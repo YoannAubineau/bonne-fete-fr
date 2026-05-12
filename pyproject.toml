@@ -12,9 +12,37 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "ruff>=0.7",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["src"]
 python_files = ["tests.py", "test_*.py"]
 pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",
+    "ANN",
+    "T201",
+    "PLR2004",
+    "EM101",
+    "EM102",
+    "TRY003",
+    "COM812",
+    "ISC001",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/tests.py" = [
+    "S101",
+    "INP001",
+]
+
+[tool.ruff.format]
