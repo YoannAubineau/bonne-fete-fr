@@ -9,7 +9,7 @@ from pathlib import Path
 from icalendar import Calendar
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ICS_PATH = PROJECT_ROOT / "artefacts" / "bonne-fete-fr.ics"
+ICS_PATH = PROJECT_ROOT / "docs" / "bonne-fete-fr.ics"
 
 MAX_PROBLEMS = 20
 
