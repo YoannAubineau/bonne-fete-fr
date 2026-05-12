@@ -98,7 +98,7 @@ def grandfathers_day(year: int) -> date:
 
 @dataclass(frozen=True)
 class Celebration:
-    # `key` is part of the immutable UID — never change it.
+    # `key` is part of the immutable UID, never change it.
     key: str
     name: str
     start_year: int
@@ -109,27 +109,27 @@ class Celebration:
 CELEBRATIONS: list[Celebration] = [
     Celebration(
         "saint-valentin", "Saint-Valentin", 1950, valentines_day,
-        "Saint-Valentin — fête des amoureux (14 février).",
+        "Saint-Valentin : fête des amoureux (14 février).",
     ),
     Celebration(
         "grands-meres", "Fête des Grands-Mères", 1987, grandmothers_day,
-        "Fête des Grands-Mères — 1ᵉʳ dimanche de mars.",
+        "Fête des Grands-Mères : 1ᵉʳ dimanche de mars.",
     ),
     Celebration(
         "meres", "Fête des Mères", 1950, mothers_day,
-        "Fête des Mères — dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
+        "Fête des Mères : dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
     ),
     Celebration(
         "peres", "Fête des Pères", 1952, fathers_day,
-        "Fête des Pères — 3ᵉ dimanche de juin.",
+        "Fête des Pères : 3ᵉ dimanche de juin.",
     ),
     Celebration(
         "grands-parents", "Journée mondiale des grands-parents", 2021, grandparents_day,
-        "Journée mondiale des grands-parents — 4ᵉ dimanche de juillet.",
+        "Journée mondiale des grands-parents : 4ᵉ dimanche de juillet.",
     ),
     Celebration(
         "grands-peres", "Fête des Grands-Pères", 2008, grandfathers_day,
-        "Fête des Grands-Pères — 1ᵉʳ dimanche d'octobre.",
+        "Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.",
     ),
 ]
 
@@ -144,7 +144,7 @@ CALENDAR_HEADER = [
     "METHOD:PUBLISH",
     "X-WR-CALNAME:Bonne Fête (France)",
     (
-        "X-WR-CALDESC:Dates annuelles des fêtes affectives en France — "
+        "X-WR-CALDESC:Dates annuelles des fêtes affectives en France : "
         "Saint-Valentin\\, fêtes des mères\\, pères\\, grands-mères\\, "
         "grands-pères\\, et Journée mondiale des grands-parents."
     ),
@@ -291,7 +291,7 @@ def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) ->
         for year in range(celebration.start_year, end_year + 1):
             computed = celebration.rule(year)
             prev = previous.get((celebration.key, year))
-            # Past events keep their historical date — never rewrite history.
+            # Past events keep their historical date, never rewrite history.
             if prev is not None and computed < today:
                 event_date = prev.event_date
             else:
@@ -360,7 +360,7 @@ def next_occurrences(today: date) -> list[tuple[Celebration, date]]:
 def render_next_dates_markdown(today: date) -> str:
     rows = next_occurrences(today)
     lines = [
-        f"- **{celebration.name}** — {format_english_date(d)}"
+        f"- **{celebration.name}**: {format_english_date(d)}"
         for celebration, d in rows
     ]
     return "\n".join(lines)
