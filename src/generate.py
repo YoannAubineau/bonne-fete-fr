@@ -79,7 +79,7 @@ def valentines_day(year: int) -> date:
 
 
 def grandmothers_day(year: int) -> date:
-    """Return the Fête des Grands-Mères date for `year` (1st Sunday of March; 1987 special-cased)."""
+    """Return Fête des Grands-Mères date for `year` (1st Sunday of March; 1987 special-cased)."""
     # First edition was Saturday 28 March 1987 (last Saturday of the month).
     if year == GRANDMOTHERS_DAY_FIRST_YEAR:
         return date(1987, 3, 28)
@@ -87,7 +87,7 @@ def grandmothers_day(year: int) -> date:
 
 
 def mothers_day(year: int) -> date:
-    """Return the Fête des Mères date for `year` (last Sunday of May; +1 week if Pentecost coincides)."""
+    """Return Fête des Mères date for `year` (last Sunday of May; +1 week on Pentecost overlap)."""
     last_sunday_may = nth_sunday(year, 5, -1)
     pentecost = easter(year) + timedelta(days=49)
     if last_sunday_may == pentecost:
@@ -135,7 +135,10 @@ CELEBRATIONS: list[Celebration] = [
     ),
     Celebration(
         "meres", "Fête des Mères", 1950, mothers_day,
-        "Fête des Mères — dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
+        (
+            "Fête des Mères — dernier dimanche de mai, "
+            "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
+        ),
     ),
     Celebration(
         "peres", "Fête des Pères", 1952, fathers_day,
@@ -223,7 +226,10 @@ def fold_line(line: str, max_octets: int = 75) -> str:
         budget = max_octets if first else (max_octets - 1)
         end = min(pos + budget, len(encoded))
         # Never cut in the middle of a UTF-8 sequence.
-        while end < len(encoded) and (encoded[end] & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_PREFIX:
+        while (
+            end < len(encoded)
+            and (encoded[end] & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_PREFIX
+        ):
             end -= 1
         chunk = encoded[pos:end]
         parts.append(chunk if first else (b" " + chunk))
@@ -308,7 +314,10 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: 
 
 # --- Build VEVENTs ---
 
-def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) -> list[tuple[date, list[str]]]:
+def build_events(
+    today: date,
+    previous: dict[tuple[str, int], PreviousEvent],
+) -> list[tuple[date, list[str]]]:
     """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
@@ -348,7 +357,7 @@ def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
 
 
 def write_ics(today: date) -> int:
-    """Write the .ics file using `today` as the cutoff for historical preservation. Return event count."""
+    """Write .ics using `today` as cutoff for historical preservation. Return event count."""
     previous = read_previous(ICS_PATH)
     events = build_events(today, previous)
     ICS_PATH.parent.mkdir(parents=True, exist_ok=True)

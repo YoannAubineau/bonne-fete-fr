@@ -28,7 +28,6 @@ src = ["src"]
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "E501",    # line too long
     "PERF401", # manual list comprehension (use `list.extend`)
     "SIM108",  # use ternary instead of if-else block
     "T201",    # `print` found
