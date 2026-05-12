@@ -250,7 +250,7 @@ def _unfold(text: str) -> list[str]:
     return unfolded.split("\n")
 
 
-def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
+def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 — single-pass RFC 5545 parser; splitting would obscure block-state logic.
     """Parse `path` and return previously-written events keyed by (celebration key, year)."""
     if not path.exists():
         return {}
