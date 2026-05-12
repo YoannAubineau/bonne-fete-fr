@@ -159,7 +159,7 @@ Helper réutilisé par 4 des 6 fêtes :
 bonne-fete-fr/
 ├── .github/
 │   └── workflows/
-│       ├── update-ics.yml           # régénération mensuelle + tests + validation + commit
+│       ├── update-calendar.yml      # régénération mensuelle + tests + validation + commit
 │       └── review-rules.yml         # ouvre une issue de vérification chaque janvier
 ├── artefacts/
 │   ├── index.html                   # page d'accueil produite (artefact, committée)
@@ -286,7 +286,7 @@ Servie depuis GitHub Pages à la racine du dépôt. `index.html` ET `index-templ
 
 ## 9. Automatisation
 
-### 9.1 Workflow `update-ics.yml`
+### 9.1 Workflow `update-calendar.yml`
 
 Régénération mensuelle.
 
