@@ -26,7 +26,7 @@ def _year_of(value: object) -> int | None:
     return None
 
 
-def main() -> int:
+def main() -> int:  # noqa: PLR0912 — linear validator; each branch reports a distinct problem.
     """Validate the generated .ics file. Return 0 on success, 1 on any problem."""
     if not ICS_PATH.exists():
         print(f"✗ file not found: {ICS_PATH}")
