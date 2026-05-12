@@ -68,7 +68,7 @@ def nth_sunday(year: int, month: int, n: int) -> date:
     raise ValueError(msg)
 
 
-# --- Celebration rules ---
+# --- Observance rules ---
 
 GRANDMOTHERS_DAY_FIRST_YEAR = 1987
 
@@ -110,11 +110,11 @@ def grandfathers_day(year: int) -> date:
     return nth_sunday(year, 10, 1)
 
 
-# --- Celebration catalog ---
+# --- Observance catalog ---
 
 @dataclass(frozen=True)
-class Celebration:
-    """A celebration definition: key, display name, start year, date rule, description."""
+class Observance:
+    """An observance definition: key, display name, start year, date rule, description."""
 
     # `key` is part of the immutable UID, never change it.
     key: str
@@ -124,31 +124,31 @@ class Celebration:
     description: str
 
 
-CELEBRATIONS: list[Celebration] = [
-    Celebration(
+OBSERVANCES: list[Observance] = [
+    Observance(
         "saint-valentin", "Saint-Valentin", 1950, valentines_day,
         "Saint-Valentin : fête des amoureux (14 février).",
     ),
-    Celebration(
+    Observance(
         "grands-meres", "Fête des Grands-Mères", 1987, grandmothers_day,
         "Fête des Grands-Mères : 1ᵉʳ dimanche de mars.",
     ),
-    Celebration(
+    Observance(
         "meres", "Fête des Mères", 1950, mothers_day,
         (
             "Fête des Mères : dernier dimanche de mai, "
             "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
         ),
     ),
-    Celebration(
+    Observance(
         "peres", "Fête des Pères", 1952, fathers_day,
         "Fête des Pères : 3ᵉ dimanche de juin.",
     ),
-    Celebration(
+    Observance(
         "grands-parents", "Journée mondiale des grands-parents", 2021, grandparents_day,
         "Journée mondiale des grands-parents : 4ᵉ dimanche de juillet.",
     ),
-    Celebration(
+    Observance(
         "grands-peres", "Fête des Grands-Pères", 2008, grandfathers_day,
         "Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.",
     ),
@@ -160,12 +160,12 @@ CELEBRATIONS: list[Celebration] = [
 CALENDAR_HEADER = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Bonne Fete//Calendrier des fetes affectives FR//FR",
+    "PRODID:-//Bonne Fete//Calendrier des fetes relationnelles//FR",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "X-WR-CALNAME:Bonne Fête (France)",
     (
-        "X-WR-CALDESC:Dates annuelles des fêtes affectives en France : "
+        "X-WR-CALDESC:Dates annuelles des fêtes relationnelles en France : "
         "Saint-Valentin\\, fêtes des mères\\, pères\\, grands-mères\\, "
         "grands-pères\\, et Journée mondiale des grands-parents."
     ),
@@ -185,18 +185,18 @@ def escape_ical_text(s: str) -> str:
     )
 
 
-def vevent_lines(celebration: Celebration, year: int, event_date: date, sequence: int) -> list[str]:
+def vevent_lines(observance: Observance, year: int, event_date: date, sequence: int) -> list[str]:
     """Ordered, unfolded lines of a single VEVENT block."""
     dtend = event_date + timedelta(days=1)
     return [
         "BEGIN:VEVENT",
-        f"UID:{celebration.key}-{year}@bonne-fete-fr",
+        f"UID:{observance.key}-{year}@bonne-fete-fr",
         f"DTSTAMP:{FROZEN_DTSTAMP}",
         f"SEQUENCE:{sequence}",
         f"DTSTART;VALUE=DATE:{event_date.strftime('%Y%m%d')}",
         f"DTEND;VALUE=DATE:{dtend.strftime('%Y%m%d')}",
-        f"SUMMARY:{escape_ical_text(celebration.name)}",
-        f"DESCRIPTION:{escape_ical_text(celebration.description)}",
+        f"SUMMARY:{escape_ical_text(observance.name)}",
+        f"DESCRIPTION:{escape_ical_text(observance.description)}",
         "TRANSP:TRANSPARENT",
         "END:VEVENT",
     ]
@@ -257,7 +257,7 @@ def _unfold(text: str) -> list[str]:
 
 
 def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 (single-pass RFC 5545 parser; splitting would obscure block-state logic)
-    """Parse `path` and return previously-written events keyed by (celebration key, year)."""
+    """Parse `path` and return previously-written events keyed by (observance key, year)."""
     if not path.exists():
         return {}
     text = path.read_text(encoding="utf-8")
@@ -321,16 +321,16 @@ def build_events(
     """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
-    for celebration in CELEBRATIONS:
-        for year in range(celebration.start_year, end_year + 1):
-            computed = celebration.rule(year)
-            prev = previous.get((celebration.key, year))
+    for observance in OBSERVANCES:
+        for year in range(observance.start_year, end_year + 1):
+            computed = observance.rule(year)
+            prev = previous.get((observance.key, year))
             # Past events keep their historical date, never rewrite history.
             if prev is not None and computed < today:
                 event_date = prev.event_date
             else:
                 event_date = computed
-            candidate = vevent_lines(celebration, year, event_date, sequence=0)
+            candidate = vevent_lines(observance, year, event_date, sequence=0)
             candidate_sig = significant_lines(candidate)
             if prev is None:
                 sequence = 0
@@ -338,7 +338,7 @@ def build_events(
                 sequence = prev.sequence
             else:
                 sequence = prev.sequence + 1
-            final = vevent_lines(celebration, year, event_date, sequence=sequence)
+            final = vevent_lines(observance, year, event_date, sequence=sequence)
             events.append((event_date, final))
     events.sort(key=lambda x: x[0])
     return events
@@ -379,15 +379,15 @@ def format_english_date(d: date) -> str:
     return f"{EN_WEEKDAYS[d.weekday()]}, {EN_MONTHS[d.month - 1]} {d.day}, {d.year}"
 
 
-def next_occurrences(today: date) -> list[tuple[Celebration, date]]:
-    """For each celebration, the next occurrence on or after `today`, sorted chronologically."""
-    result: list[tuple[Celebration, date]] = []
-    for celebration in CELEBRATIONS:
-        year = max(today.year, celebration.start_year)
+def next_occurrences(today: date) -> list[tuple[Observance, date]]:
+    """For each observance, the next occurrence on or after `today`, sorted chronologically."""
+    result: list[tuple[Observance, date]] = []
+    for observance in OBSERVANCES:
+        year = max(today.year, observance.start_year)
         while True:
-            d = celebration.rule(year)
+            d = observance.rule(year)
             if d >= today:
-                result.append((celebration, d))
+                result.append((observance, d))
                 break
             year += 1
     result.sort(key=lambda x: x[1])
@@ -395,11 +395,11 @@ def next_occurrences(today: date) -> list[tuple[Celebration, date]]:
 
 
 def render_next_dates_markdown(today: date) -> str:
-    """Render the next occurrence of each celebration as a Markdown bullet list."""
+    """Render the next occurrence of each observance as a Markdown bullet list."""
     rows = next_occurrences(today)
     lines = [
-        f"- **{celebration.name}**: {format_english_date(d)}"
-        for celebration, d in rows
+        f"- **{observance.name}**: {format_english_date(d)}"
+        for observance, d in rows
     ]
     return "\n".join(lines)
 

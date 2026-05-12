@@ -4,7 +4,7 @@
 
 ## 1. Vision
 
-**Bonne Fête** est un calendrier iCalendar (`.ics`) public, gratuit auquel n'importe qui peut s'abonner depuis Google Calendar, Apple Calendar ou Outlook pour ne plus jamais oublier les fêtes affectives annuelles en France : Saint-Valentin, fêtes des mères, pères, grands-mères, grands-pères, et Journée mondiale des grands-parents.
+**Bonne Fête** est un calendrier iCalendar (`.ics`) public, gratuit auquel n'importe qui peut s'abonner depuis Google Calendar, Apple Calendar ou Outlook pour ne plus jamais oublier les fêtes relationnelles annuelles en France : Saint-Valentin, fêtes des mères, pères, grands-mères, grands-pères, et Journée mondiale des grands-parents.
 
 Le projet a trois qualités revendiquées :
 
@@ -44,9 +44,9 @@ Notes :
 
 Métadonnées `VCALENDAR` à inclure :
 
-- `PRODID:-//Bonne Fete//Calendrier des fetes affectives FR//FR`
+- `PRODID:-//Bonne Fete//Calendrier des fetes relationnelles FR//FR`
 - `X-WR-CALNAME:Bonne Fête (France)`
-- `X-WR-CALDESC:Dates annuelles des fêtes affectives en France — Saint-Valentin, fêtes des mères, pères, grands-mères, grands-pères, et Journée mondiale des grands-parents.`
+- `X-WR-CALDESC:Dates annuelles des fêtes relationnelles en France : Saint-Valentin, fêtes des mères, pères, grands-mères, grands-pères, et Journée mondiale des grands-parents.`
 - `X-WR-TIMEZONE:Europe/Paris`
 - `CALSCALE:GREGORIAN`
 - `METHOD:PUBLISH`

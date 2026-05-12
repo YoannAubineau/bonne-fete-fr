@@ -79,6 +79,6 @@ CASES = [
 
 
 @pytest.mark.parametrize(("fn", "year", "expected"), CASES)
-def test_celebration_date(fn: Callable[[int], date], year: int, expected: date) -> None:
+def test_observance_date(fn: Callable[[int], date], year: int, expected: date) -> None:
     """Check that `fn(year)` returns the pinned expected date."""
     assert fn(year) == expected
