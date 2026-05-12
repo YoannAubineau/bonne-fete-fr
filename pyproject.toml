@@ -1,7 +1,7 @@
 [project]
 name = "bonne-fete-fr"
 version = "0.1.0"
-description = "Public iCalendar feed for the French affective holidays"
+description = "Public iCalendar feed for the French family celebration days"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
