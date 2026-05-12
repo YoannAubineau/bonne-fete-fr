@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -15,8 +16,17 @@ from generate import (
     valentines_day,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
-def _case(label, fn, year, expected):
+
+def _case(
+    label: str,
+    fn: Callable[[int], date],
+    year: int,
+    expected: date,
+) -> pytest.ParameterSet:
+    """Build a parametrize entry with a stable test id."""
     return pytest.param(fn, year, expected, id=f"{label}-{year}")
 
 
@@ -69,5 +79,6 @@ CASES = [
 
 
 @pytest.mark.parametrize(("fn", "year", "expected"), CASES)
-def test_celebration_date(fn, year, expected):
+def test_celebration_date(fn: Callable[[int], date], year: int, expected: date) -> None:
+    """Check that `fn(year)` returns the pinned expected date."""
     assert fn(year) == expected

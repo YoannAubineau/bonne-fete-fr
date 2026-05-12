@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # --- Configuration ---
 
@@ -24,6 +28,8 @@ README_NEXT_DATES_END = "<!-- END: next-dates -->"
 
 # --- Date helpers ---
 
+DECEMBER = 12
+
 def easter(year: int) -> date:
     """Easter Sunday via the Meeus/Jones/Butcher Gregorian computus."""
     a = year % 19
@@ -36,7 +42,7 @@ def easter(year: int) -> date:
     h = (19 * a + b - d - g + 15) % 30
     i = c // 4
     k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7
+    l = (32 + 2 * e + 2 * i - h - k) % 7  # noqa: E741 (variable names match Meeus's published formula)
     m = (a + 11 * h + 22 * l) // 451
     month = (h + l - 7 * m + 114) // 31
     day = ((h + l - 7 * m + 114) % 31) + 1
@@ -46,8 +52,8 @@ def easter(year: int) -> date:
 def nth_sunday(year: int, month: int, n: int) -> date:
     """Return the n-th Sunday of the month. n in {1, 2, 3, 4, -1 (last)}."""
     if n == -1:
-        if month == 12:
-            last = date(year, 12, 31)
+        if month == DECEMBER:
+            last = date(year, DECEMBER, 31)
         else:
             last = date(year, month + 1, 1) - timedelta(days=1)
         # weekday(): Monday=0, Sunday=6
@@ -58,23 +64,30 @@ def nth_sunday(year: int, month: int, n: int) -> date:
         offset_forward = (6 - first.weekday()) % 7
         first_sunday = first + timedelta(days=offset_forward)
         return first_sunday + timedelta(weeks=n - 1)
-    raise ValueError(f"Unsupported nth: {n}")
+    msg = f"Unsupported nth: {n}"
+    raise ValueError(msg)
 
 
 # --- Celebration rules ---
 
+GRANDMOTHERS_DAY_FIRST_YEAR = 1987
+
+
 def valentines_day(year: int) -> date:
+    """Return the Saint-Valentin date for `year` (14 February)."""
     return date(year, 2, 14)
 
 
 def grandmothers_day(year: int) -> date:
+    """Return Fête des Grands-Mères date for `year` (1st Sunday of March; 1987 special-cased)."""
     # First edition was Saturday 28 March 1987 (last Saturday of the month).
-    if year == 1987:
+    if year == GRANDMOTHERS_DAY_FIRST_YEAR:
         return date(1987, 3, 28)
     return nth_sunday(year, 3, 1)
 
 
 def mothers_day(year: int) -> date:
+    """Return Fête des Mères date for `year` (last Sunday of May; +1 week on Pentecost overlap)."""
     last_sunday_may = nth_sunday(year, 5, -1)
     pentecost = easter(year) + timedelta(days=49)
     if last_sunday_may == pentecost:
@@ -83,14 +96,17 @@ def mothers_day(year: int) -> date:
 
 
 def fathers_day(year: int) -> date:
+    """Return the Fête des Pères date for `year` (3rd Sunday of June)."""
     return nth_sunday(year, 6, 3)
 
 
 def grandparents_day(year: int) -> date:
+    """Return the Journée mondiale des grands-parents date for `year` (4th Sunday of July)."""
     return nth_sunday(year, 7, 4)
 
 
 def grandfathers_day(year: int) -> date:
+    """Return the Fête des Grands-Pères date for `year` (1st Sunday of October)."""
     return nth_sunday(year, 10, 1)
 
 
@@ -98,6 +114,8 @@ def grandfathers_day(year: int) -> date:
 
 @dataclass(frozen=True)
 class Celebration:
+    """A celebration definition: key, display name, start year, date rule, description."""
+
     # `key` is part of the immutable UID, never change it.
     key: str
     name: str
@@ -117,7 +135,10 @@ CELEBRATIONS: list[Celebration] = [
     ),
     Celebration(
         "meres", "Fête des Mères", 1950, mothers_day,
-        "Fête des Mères : dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
+        (
+            "Fête des Mères : dernier dimanche de mai, "
+            "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
+        ),
     ),
     Celebration(
         "peres", "Fête des Pères", 1952, fathers_day,
@@ -189,6 +210,10 @@ def significant_lines(lines: list[str]) -> list[str]:
     ]
 
 
+UTF8_CONTINUATION_MASK = 0xC0
+UTF8_CONTINUATION_PREFIX = 0x80
+
+
 def fold_line(line: str, max_octets: int = 75) -> str:
     """Fold a long line per RFC 5545 §3.1 (75 octets max, continuation prefixed by a space)."""
     encoded = line.encode("utf-8")
@@ -201,7 +226,10 @@ def fold_line(line: str, max_octets: int = 75) -> str:
         budget = max_octets if first else (max_octets - 1)
         end = min(pos + budget, len(encoded))
         # Never cut in the middle of a UTF-8 sequence.
-        while end < len(encoded) and (encoded[end] & 0xC0) == 0x80:
+        while (
+            end < len(encoded)
+            and (encoded[end] & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_PREFIX
+        ):
             end -= 1
         chunk = encoded[pos:end]
         parts.append(chunk if first else (b" " + chunk))
@@ -214,6 +242,8 @@ def fold_line(line: str, max_octets: int = 75) -> str:
 
 @dataclass
 class PreviousEvent:
+    """A previously-written event recovered from the existing .ics file."""
+
     event_date: date
     sequence: int
     significant: list[str]
@@ -226,7 +256,8 @@ def _unfold(text: str) -> list[str]:
     return unfolded.split("\n")
 
 
-def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
+def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 (single-pass RFC 5545 parser; splitting would obscure block-state logic)
+    """Parse `path` and return previously-written events keyed by (celebration key, year)."""
     if not path.exists():
         return {}
     text = path.read_text(encoding="utf-8")
@@ -283,7 +314,10 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
 
 # --- Build VEVENTs ---
 
-def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) -> list[tuple[date, list[str]]]:
+def build_events(
+    today: date,
+    previous: dict[tuple[str, int], PreviousEvent],
+) -> list[tuple[date, list[str]]]:
     """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
@@ -311,6 +345,7 @@ def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) ->
 
 
 def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
+    """Serialize the calendar header, events, and footer to RFC 5545 bytes."""
     all_lines: list[str] = []
     all_lines.extend(CALENDAR_HEADER)
     for _, ev_lines in events:
@@ -322,6 +357,7 @@ def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
 
 
 def write_ics(today: date) -> int:
+    """Write .ics using `today` as cutoff for historical preservation. Return event count."""
     previous = read_previous(ICS_PATH)
     events = build_events(today, previous)
     ICS_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -339,6 +375,7 @@ EN_MONTHS = [
 
 
 def format_english_date(d: date) -> str:
+    """Format `d` as e.g. `Sunday, June 1, 2025`."""
     return f"{EN_WEEKDAYS[d.weekday()]}, {EN_MONTHS[d.month - 1]} {d.day}, {d.year}"
 
 
@@ -358,6 +395,7 @@ def next_occurrences(today: date) -> list[tuple[Celebration, date]]:
 
 
 def render_next_dates_markdown(today: date) -> str:
+    """Render the next occurrence of each celebration as a Markdown bullet list."""
     rows = next_occurrences(today)
     lines = [
         f"- **{celebration.name}**: {format_english_date(d)}"
@@ -367,6 +405,7 @@ def render_next_dates_markdown(today: date) -> str:
 
 
 def write_readme(today: date) -> None:
+    """Refresh the next-dates block of the README in place."""
     text = README_PATH.read_text(encoding="utf-8")
     begin = text.index(README_NEXT_DATES_BEGIN) + len(README_NEXT_DATES_BEGIN)
     end = text.index(README_NEXT_DATES_END, begin)
@@ -375,7 +414,8 @@ def write_readme(today: date) -> None:
 
 
 def main() -> int:
-    today = date.today()
+    """Generate the .ics calendar and refresh the README."""
+    today = datetime.now(tz=ZoneInfo("Europe/Paris")).date()
     n = write_ics(today)
     write_readme(today)
     print(f"✓ wrote {n} VEVENT to {ICS_PATH.relative_to(PROJECT_ROOT)}")
