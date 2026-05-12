@@ -256,15 +256,13 @@ La page d'accueil est **un artefact généré** par `generate.py` à partir d'un
 | `{{URL_ICS}}` | Valeur de `URL_PUBLIQUE` |
 | `{{URL_GCAL}}` | URL Google Calendar 1-clic : `https://calendar.google.com/calendar/r/settings/addbyurl?url={URL_ICS encodée}` |
 | `{{URL_WEBCAL}}` | Version `webcal://` de `URL_PUBLIQUE` |
-| `{{COMPTEUR_SCRIPT}}` | Bloc `<script>` du compteur (§12), ou chaîne vide si `COMPTEUR_API = None` |
 
 ### 8.2 Exigences fonctionnelles
 
 - **Titre H1** parlant : « Calendrier des fêtes affectives en France » ou équivalent.
 - **Liste des prochaines dates** : une ligne par fête, triée chronologiquement à partir d'aujourd'hui (donc affiche éventuellement des dates de l'année suivante pour les fêtes déjà passées de l'année courante).
-- **Trois boutons d'abonnement** : Google Calendar (primaire), Apple/Outlook (webcal://), Téléchargement (.ics direct). Tous portent la classe CSS `subscribe-btn` pour que le compteur puisse y attacher des handlers.
+- **Trois boutons d'abonnement** : Google Calendar (primaire), Apple/Outlook (webcal://), Téléchargement (.ics direct). Tous portent la classe CSS `subscribe-btn`.
 - **URL brute** affichée en clair sous les boutons.
-- **Compteur d'abonnements** (§12) : zone vide au chargement, remplie par JavaScript depuis l'API de compteur.
 - **Brève section « Pourquoi ? »** justifiant la valeur du projet (exception Pentecôte, anomalie 1987).
 
 ### 8.3 Exigences SEO et partage
@@ -366,29 +364,7 @@ Utilise la bibliothèque [`icalendar`](https://pypi.org/project/icalendar/) (mat
 
 ---
 
-## 12. Compteur d'abonnements
-
-### 12.1 Approche
-
-Compter réellement les abonnés à un `.ics` est techniquement difficile sans serveur dédié (un client calendrier rafetche typiquement le fichier 1× par jour, donc les requêtes HTTP brutes surestiment d'un facteur 50–100). Le compromis retenu : **compter les clics sur les boutons d'abonnement** depuis la page d'accueil, via une API de compteur tierce ne stockant aucune donnée individuelle.
-
-### 12.2 Service
-
-Par défaut, [counterapi.dev](https://counterapi.dev) v1 : gratuit, sans inscription, basé sur un couple namespace + nom de compteur servant de clé. Configuré via la constante `COMPTEUR_API` dans `generate.py`. Le service est aisément remplaçable par n'importe quel autre fournissant des endpoints `GET {URL}` (lire) et `GET {URL}/up` (incrémenter) — Cloudflare Workers, Vercel KV, etc.
-
-### 12.3 Comportement côté navigateur
-
-JavaScript injecté dans `index.html` par le template (via `{{COMPTEUR_SCRIPT}}`) :
-- **Au chargement** : appel `GET COMPTEUR_API`, lecture du champ `count` (ou `value` selon le service), affichage dans `<p id="compteur">Déjà N ajouts au calendrier</p>` si N > 0. Échec silencieux si l'API est indisponible (la page reste lisible).
-- **Au clic sur n'importe quel bouton portant la classe `subscribe-btn`** : appel `GET COMPTEUR_API/up` en fire-and-forget (pas d'attente), puis suivi normal du lien.
-
-### 12.4 Étiquetage honnête
-
-Le compteur affiche « ajouts au calendrier », pas « abonnés », pour ne pas mentir : un clic n'est pas une vraie souscription confirmée. Mettre `COMPTEUR_API = None` désactive entièrement la feature (aucun script JS n'est émis).
-
----
-
-## 14. Critères d'acceptation
+## 13. Critères d'acceptation
 
 Le projet est conforme à cette spécification si **tous** les critères suivants sont satisfaits :
 
@@ -402,14 +378,13 @@ Le projet est conforme à cette spécification si **tous** les critères suivant
 8. ✅ Modifier la fonction `fete_des_meres` pour renvoyer une date différente, puis relancer → seuls les événements `fete-meres-*` futurs voient leur date changer et leur `SEQUENCE` incrémenter ; les passés et les autres fêtes restent inchangés.
 9. ✅ `index.html` est régénérée automatiquement à chaque `uv run generate.py`, contient les 6 fêtes dans l'ordre chronologique à partir d'aujourd'hui, et utilise `URL_PUBLIQUE` pour construire les 3 boutons d'abonnement.
 10. ✅ Exécuter `uv run validate.py` après `generate.py` → tous les contrôles passent, code de sortie 0. Modifier manuellement le `.ics` pour y introduire un UID en double → `validate.py` détecte le problème et sort en code 1.
-11. ✅ `index.html` affiche un compteur d'abonnements via l'API configurée (ou pas de compteur si `COMPTEUR_API = None`), et le clic sur un bouton `.subscribe-btn` déclenche un appel `/up` à l'API.
-12. ✅ Le workflow GitHub Actions de régénération exécute, dans l'ordre, tests → generate → validate → commit, et committe seulement quand au moins un des deux artefacts (`.ics` ou `index.html`) a réellement changé.
-13. ✅ Le workflow de rappel annuel crée une issue avec une check-list couvrant les six règles et leurs sources respectives.
-14. ✅ Les fichiers `LICENSE` et `README.md` sont présents à la racine.
+11. ✅ Le workflow GitHub Actions de régénération exécute, dans l'ordre, tests → generate → validate → commit, et committe seulement quand au moins un des deux artefacts (`.ics` ou `index.html`) a réellement changé.
+12. ✅ Le workflow de rappel annuel crée une issue avec une check-list couvrant les six règles et leurs sources respectives.
+13. ✅ Les fichiers `LICENSE` et `README.md` sont présents à la racine.
 
 ---
 
-## 15. Annexes
+## 14. Annexes
 
 ### A. Sources de référence
 

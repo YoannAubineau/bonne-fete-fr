@@ -118,12 +118,6 @@
     border-radius: 4px;
     font-size: 0.85rem;
   }
-  #subscription-counter {
-    color: var(--accent);
-    font-size: 0.95rem;
-    margin: 0.6rem 0 0;
-    min-height: 1.2em;
-  }
   .why p { margin: 0.6rem 0; }
   em { color: var(--accent); font-style: italic; }
   footer {
@@ -154,7 +148,6 @@
       <a href="{{ICS_URL}}" class="subscribe-btn" download>Télécharger le .ics</a>
     </div>
     <p class="raw-url">URL d'abonnement : <code>{{ICS_URL}}</code></p>
-    <p id="subscription-counter"></p>
   </section>
 
   <section class="why">
@@ -167,7 +160,5 @@
     <p><a href="https://github.com/YoannAubineau/bonne-fete-fr">Code source</a> · Calendrier généré automatiquement · Domaine public</p>
   </footer>
 </main>
-
-{{COUNTER_SCRIPT}}
 </body>
 </html>

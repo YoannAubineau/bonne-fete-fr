@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -13,7 +12,6 @@ from urllib.parse import quote
 # --- Configuration ---
 
 PUBLIC_URL = "https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics"
-COUNTER_API: str | None = "https://api.counterapi.dev/v1/bonne-fete-fr/subscriptions"
 FUTURE_YEARS = 30
 MIN_START_YEAR = 1950
 FROZEN_DTSTAMP = "19500101T000000Z"
@@ -399,31 +397,6 @@ def render_next_dates_markdown(today: date) -> str:
     return "\n".join(lines)
 
 
-def counter_script() -> str:
-    if COUNTER_API is None:
-        return ""
-    api = json.dumps(COUNTER_API)
-    return (
-        "<script>\n"
-        "(function () {\n"
-        f"  var api = {api};\n"
-        "  fetch(api).then(function (r) { return r.json(); }).then(function (data) {\n"
-        "    var n = (data && (data.count != null ? data.count : data.value)) || 0;\n"
-        "    if (n > 0) {\n"
-        "      document.getElementById('subscription-counter').textContent =\n"
-        "        'Déjà ' + n + ' ajouts au calendrier';\n"
-        "    }\n"
-        "  }).catch(function () {});\n"
-        "  document.querySelectorAll('.subscribe-btn').forEach(function (btn) {\n"
-        "    btn.addEventListener('click', function () {\n"
-        "      fetch(api + '/up').catch(function () {});\n"
-        "    });\n"
-        "  });\n"
-        "})();\n"
-        "</script>"
-    )
-
-
 def write_html(today: date) -> None:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     gcal_url = "https://calendar.google.com/calendar/r/settings/addbyurl?url=" + quote(PUBLIC_URL, safe="")
@@ -438,7 +411,6 @@ def write_html(today: date) -> None:
         .replace("{{GCAL_URL}}", gcal_url)
         .replace("{{WEBCAL_URL}}", webcal_url)
         .replace("{{ICS_URL}}", PUBLIC_URL)
-        .replace("{{COUNTER_SCRIPT}}", counter_script())
     )
     HTML_PATH.parent.mkdir(parents=True, exist_ok=True)
     HTML_PATH.write_text(html, encoding="utf-8")

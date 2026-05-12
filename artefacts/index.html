@@ -118,12 +118,6 @@
     border-radius: 4px;
     font-size: 0.85rem;
   }
-  #subscription-counter {
-    color: var(--accent);
-    font-size: 0.95rem;
-    margin: 0.6rem 0 0;
-    min-height: 1.2em;
-  }
   .why p { margin: 0.6rem 0; }
   em { color: var(--accent); font-style: italic; }
   footer {
@@ -159,7 +153,6 @@
       <a href="https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics" class="subscribe-btn" download>Télécharger le .ics</a>
     </div>
     <p class="raw-url">URL d'abonnement : <code>https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics</code></p>
-    <p id="subscription-counter"></p>
   </section>
 
   <section class="why">
@@ -172,23 +165,5 @@
     <p><a href="https://github.com/YoannAubineau/bonne-fete-fr">Code source</a> · Calendrier généré automatiquement · Domaine public</p>
   </footer>
 </main>
-
-<script>
-(function () {
-  var api = "https://api.counterapi.dev/v1/bonne-fete-fr/subscriptions";
-  fetch(api).then(function (r) { return r.json(); }).then(function (data) {
-    var n = (data && (data.count != null ? data.count : data.value)) || 0;
-    if (n > 0) {
-      document.getElementById('subscription-counter').textContent =
-        'Déjà ' + n + ' ajouts au calendrier';
-    }
-  }).catch(function () {});
-  document.querySelectorAll('.subscribe-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      fetch(api + '/up').catch(function () {});
-    });
-  });
-})();
-</script>
 </body>
 </html>
