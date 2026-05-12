@@ -1,5 +1,8 @@
 name: sync-rulesets
 
+# Requires an ADMIN_TOKEN repo secret: a fine-grained PAT scoped to this repo
+# with "Administration: Read and write". The default GITHUB_TOKEN cannot manage
+# rulesets, so the job is skipped (with a warning) when ADMIN_TOKEN is absent.
 on:
   push:
     branches: [main]
@@ -9,18 +12,31 @@ on:
   workflow_dispatch:
 
 permissions:
-  administration: write
   contents: read
 
 jobs:
   apply:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check for ADMIN_TOKEN
+        id: token
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+        run: |
+          if [ -z "$ADMIN_TOKEN" ]; then
+            echo "::warning::ADMIN_TOKEN secret not set ; ruleset sync skipped. Create a fine-grained PAT scoped to this repo with 'Administration: Read and write' and add it as the ADMIN_TOKEN secret."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v6
+        if: steps.token.outputs.present == 'true'
 
       - name: Apply rulesets
+        if: steps.token.outputs.present == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ADMIN_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
