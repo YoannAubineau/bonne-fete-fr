@@ -18,7 +18,7 @@ A free public iCalendar (`.ics`) feed for the six affective celebrations observe
 Once added, the dates appear in your calendar automatically, every year.
 
 - [Google Calendar (one click)](https://calendar.google.com/calendar/r/settings/addbyurl?url=https%3A%2F%2Fyoannaubineau.github.io%2Fbonne-fete-fr%2Fbonne-fete-fr.ics)
-- [Apple Calendar / Outlook (webcal://)](webcal://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics)
+- Apple Calendar / Outlook — subscribe to `webcal://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics`
 - [Download the .ics](https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics)
 
 Subscription URL: `https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics`
