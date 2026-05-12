@@ -162,13 +162,11 @@ bonne-fete-fr/
 │       ├── update-calendar.yml      # régénération mensuelle + tests + validation + commit
 │       └── annual-rules-review.yml  # ouvre une issue de vérification chaque janvier
 ├── artefacts/
-│   ├── index.html                   # page d'accueil produite (artefact, committée)
 │   └── bonne-fete-fr.ics            # calendrier produit (artefact, committé)
 ├── src/
-│   ├── generate.py                  # générateur du .ics ET de index.html
+│   ├── generate.py                  # générateur du .ics
 │   ├── tests.py                     # tests de non-régression des dates calculées
-│   ├── validate.py                  # validation stricte RFC 5545 du .ics produit
-│   └── index-template.html          # template de la page d'accueil (source à éditer)
+│   └── validate.py                  # validation stricte RFC 5545 du .ics produit
 ├── pyproject.toml                   # déclaration du projet et de la dépendance `icalendar`
 ├── uv.lock                          # lock-file des dépendances, géré par uv
 ├── SPEC.md                          # ce document
@@ -242,46 +240,6 @@ Au minimum, les dates suivantes doivent être présentes comme assertions. Toute
 
 ---
 
-## 8. Page d'accueil — `index.html`
-
-La page d'accueil est **un artefact généré** par `generate.py` à partir d'un fichier source `index-template.html`. La séparation template/artefact garantit que les dates affichées restent toujours synchronisées avec le contenu du `.ics`, et que les boutons d'abonnement utilisent la même `URL_PUBLIQUE`.
-
-### 8.1 Approche template
-
-`index-template.html` est un HTML statique contenant quatre placeholders à substituer :
-
-| Placeholder | Substitué par |
-|---|---|
-| `{{PROCHAINES_DATES}}` | HTML d'une liste de `<div class="date-row">…</div>` pour chaque fête, dans l'ordre chronologique des prochaines dates à partir d'aujourd'hui. La première (la plus proche) reçoit la classe additionnelle `featured` pour la mettre en valeur visuellement. Date formatée en français (« samedi 14 février 2026 »). |
-| `{{URL_ICS}}` | Valeur de `URL_PUBLIQUE` |
-| `{{URL_GCAL}}` | URL Google Calendar 1-clic : `https://calendar.google.com/calendar/r/settings/addbyurl?url={URL_ICS encodée}` |
-| `{{URL_WEBCAL}}` | Version `webcal://` de `URL_PUBLIQUE` |
-
-### 8.2 Exigences fonctionnelles
-
-- **Titre H1** parlant : « Calendrier des fêtes affectives en France » ou équivalent.
-- **Liste des prochaines dates** : une ligne par fête, triée chronologiquement à partir d'aujourd'hui (donc affiche éventuellement des dates de l'année suivante pour les fêtes déjà passées de l'année courante).
-- **Trois boutons d'abonnement** : Google Calendar (primaire), Apple/Outlook (webcal://), Téléchargement (.ics direct). Tous portent la classe CSS `subscribe-btn`.
-- **URL brute** affichée en clair sous les boutons.
-- **Brève section « Pourquoi ? »** justifiant la valeur du projet (exception Pentecôte, anomalie 1987).
-
-### 8.3 Exigences SEO et partage
-
-- `<title>` : « Bonne Fête — Calendrier des fêtes affectives en France ».
-- `<meta name="description">` (~150 caractères).
-- Balises Open Graph : `og:title`, `og:description`, `og:type=website`. **`og:image`** : recommandé (image carrée 1200×1200px déposée à la racine du dépôt, déclarée dans la balise). Élément fortement recommandé avant publication, parce que c'est ce que les visiteurs verront en aperçu lors d'un partage sur WhatsApp, Messenger ou Twitter.
-- HTML sémantique (h1, sections), `lang="fr"`.
-
-### 8.4 Design
-
-Aesthetic libre. Le projet n'impose pas de style mais une page **personnelle, chaleureuse, lisible** sert mieux la mission qu'un design générique de SaaS. Une page d'une seule vue (pas de scroll infini), un fichier HTML monolithique avec CSS inline, polices Google Fonts pour le caractère.
-
-### 8.5 Hébergement
-
-Servie depuis GitHub Pages à la racine du dépôt. `index.html` ET `index-template.html` sont commités, mais seul `index.html` est servi publiquement (Pages ne fait pas de templating).
-
----
-
 ## 9. Automatisation
 
 ### 9.1 Workflow `update-calendar.yml`
@@ -295,9 +253,9 @@ Régénération mensuelle.
   2. `astral-sh/setup-uv@v4` (installe `uv` ; active le cache des dépendances via le `uv.lock` versionné).
   3. `uv sync --frozen` (installe la dépendance `icalendar` dans un `.venv/` local, à l'identique du lock-file).
   4. Lancer `uv run tests.py`. Si échec, **arrêt** — garde-fou contre la publication d'un calcul cassé.
-  5. Lancer `uv run generate.py` (régénère `bonne-fete-fr.ics` ET `index.html`).
+  5. Lancer `uv run generate.py` (régénère `bonne-fete-fr.ics`).
   6. Lancer `uv run validate.py`. Si échec, **arrêt** — garde-fou contre la publication d'un `.ics` invalide.
-  7. `git add bonne-fete-fr.ics index.html`. Si `git diff --staged --quiet` est vrai → rien à committer, sortir. Sinon, committer avec message `automatic calendar update` et `git push`.
+  7. `git add bonne-fete-fr.ics`. Si `git diff --staged --quiet` est vrai → rien à committer, sortir. Sinon, committer avec message `automatic calendar update` et `git push`.
 
 **Justification du cron mensuel plutôt qu'annuel** : un run mensuel reste un no-op 11 mois sur 12 (le `.ics` ne change pas si l'année n'a pas changé). Mais si un run échoue ou est sauté (incidents GitHub, etc.), il sera rattrapé le mois suivant. Robuste sans coût.
 
@@ -328,7 +286,6 @@ GitHub Pages, branche `main`, dossier racine.
 
 | Ressource | URL |
 |---|---|
-| Page d'accueil | `https://{user}.github.io/{repo}/` |
 | Fichier `.ics` | `https://{user}.github.io/{repo}/bonne-fete-fr.ics` |
 | Abonnement Apple/Outlook | `webcal://{user}.github.io/{repo}/bonne-fete-fr.ics` |
 | Abonnement Google Calendar | `https://calendar.google.com/calendar/r/settings/addbyurl?url={URL_ENCODÉE}` |
@@ -364,7 +321,7 @@ Utilise la bibliothèque [`icalendar`](https://pypi.org/project/icalendar/) (mat
 
 ---
 
-## 13. Critères d'acceptation
+## 14. Critères d'acceptation
 
 Le projet est conforme à cette spécification si **tous** les critères suivants sont satisfaits :
 
@@ -376,15 +333,14 @@ Le projet est conforme à cette spécification si **tous** les critères suivant
 6. ✅ Exécuter `uv run generate.py` deux fois de suite sans changement produit un fichier **identique au bit près** (`md5sum` identique).
 7. ✅ Modifier manuellement une date passée dans le `.ics` puis relancer `uv run generate.py` → la modification est **conservée** (pas écrasée par recalcul).
 8. ✅ Modifier la fonction `fete_des_meres` pour renvoyer une date différente, puis relancer → seuls les événements `fete-meres-*` futurs voient leur date changer et leur `SEQUENCE` incrémenter ; les passés et les autres fêtes restent inchangés.
-9. ✅ `index.html` est régénérée automatiquement à chaque `uv run generate.py`, contient les 6 fêtes dans l'ordre chronologique à partir d'aujourd'hui, et utilise `URL_PUBLIQUE` pour construire les 3 boutons d'abonnement.
-10. ✅ Exécuter `uv run validate.py` après `generate.py` → tous les contrôles passent, code de sortie 0. Modifier manuellement le `.ics` pour y introduire un UID en double → `validate.py` détecte le problème et sort en code 1.
-11. ✅ Le workflow GitHub Actions de régénération exécute, dans l'ordre, tests → generate → validate → commit, et committe seulement quand au moins un des deux artefacts (`.ics` ou `index.html`) a réellement changé.
-12. ✅ Le workflow de rappel annuel crée une issue avec une check-list couvrant les six règles et leurs sources respectives.
-13. ✅ Les fichiers `LICENSE` et `README.md` sont présents à la racine.
+9. ✅ Exécuter `uv run validate.py` après `generate.py` → tous les contrôles passent, code de sortie 0. Modifier manuellement le `.ics` pour y introduire un UID en double → `validate.py` détecte le problème et sort en code 1.
+10. ✅ Le workflow GitHub Actions de régénération exécute, dans l'ordre, tests → generate → validate → commit, et committe seulement quand l'artefact `.ics` a réellement changé.
+11. ✅ Le workflow de rappel annuel crée une issue avec une check-list couvrant les six règles et leurs sources respectives.
+12. ✅ Les fichiers `LICENSE` et `README.md` sont présents à la racine.
 
 ---
 
-## 14. Annexes
+## 15. Annexes
 
 ### A. Sources de référence
 
