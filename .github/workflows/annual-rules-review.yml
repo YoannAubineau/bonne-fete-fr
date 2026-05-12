@@ -35,7 +35,7 @@ jobs:
 
           1. Modifier la fonction concernée dans `src/generate.py`.
           2. Ajouter ou ajuster les dates pinnées dans `src/tests.py`.
-          3. Déclencher manuellement le workflow « Update calendar » pour propager.
+          3. Déclencher manuellement le workflow « update-calendar » pour propager.
 
           *Issue créée automatiquement par `.github/workflows/annual-rules-review.yml`.*
           EOF
