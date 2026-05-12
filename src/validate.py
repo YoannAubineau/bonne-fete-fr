@@ -26,7 +26,7 @@ def _year_of(value: object) -> int | None:
     return None
 
 
-def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each branch reports a distinct problem.
+def main() -> int:  # noqa: C901, PLR0912, PLR0915 (linear validator; each branch reports a distinct problem)
     """Validate the generated .ics file. Return 0 on success, 1 on any problem."""
     if not ICS_PATH.exists():
         print(f"✗ file not found: {ICS_PATH}")
@@ -37,7 +37,7 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each br
     try:
         cal = Calendar.from_ical(raw)
         print("✓ iCalendar parsing")
-    except Exception as exc:  # noqa: BLE001 — catch-all to report cleanly.
+    except Exception as exc:  # noqa: BLE001 (catch-all to report cleanly)
         print(f"✗ iCalendar parsing: {exc}")
         return 1
 

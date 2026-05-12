@@ -42,7 +42,7 @@ def easter(year: int) -> date:
     h = (19 * a + b - d - g + 15) % 30
     i = c // 4
     k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7  # noqa: E741 — variable names match Meeus's published formula.
+    l = (32 + 2 * e + 2 * i - h - k) % 7  # noqa: E741 (variable names match Meeus's published formula)
     m = (a + 11 * h + 22 * l) // 451
     month = (h + l - 7 * m + 114) // 31
     day = ((h + l - 7 * m + 114) % 31) + 1
@@ -116,7 +116,7 @@ def grandfathers_day(year: int) -> date:
 class Celebration:
     """A celebration definition: key, display name, start year, date rule, description."""
 
-    # `key` is part of the immutable UID — never change it.
+    # `key` is part of the immutable UID, never change it.
     key: str
     name: str
     start_year: int
@@ -127,30 +127,30 @@ class Celebration:
 CELEBRATIONS: list[Celebration] = [
     Celebration(
         "saint-valentin", "Saint-Valentin", 1950, valentines_day,
-        "Saint-Valentin — fête des amoureux (14 février).",
+        "Saint-Valentin : fête des amoureux (14 février).",
     ),
     Celebration(
         "grands-meres", "Fête des Grands-Mères", 1987, grandmothers_day,
-        "Fête des Grands-Mères — 1ᵉʳ dimanche de mars.",
+        "Fête des Grands-Mères : 1ᵉʳ dimanche de mars.",
     ),
     Celebration(
         "meres", "Fête des Mères", 1950, mothers_day,
         (
-            "Fête des Mères — dernier dimanche de mai, "
+            "Fête des Mères : dernier dimanche de mai, "
             "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
         ),
     ),
     Celebration(
         "peres", "Fête des Pères", 1952, fathers_day,
-        "Fête des Pères — 3ᵉ dimanche de juin.",
+        "Fête des Pères : 3ᵉ dimanche de juin.",
     ),
     Celebration(
         "grands-parents", "Journée mondiale des grands-parents", 2021, grandparents_day,
-        "Journée mondiale des grands-parents — 4ᵉ dimanche de juillet.",
+        "Journée mondiale des grands-parents : 4ᵉ dimanche de juillet.",
     ),
     Celebration(
         "grands-peres", "Fête des Grands-Pères", 2008, grandfathers_day,
-        "Fête des Grands-Pères — 1ᵉʳ dimanche d'octobre.",
+        "Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.",
     ),
 ]
 
@@ -165,7 +165,7 @@ CALENDAR_HEADER = [
     "METHOD:PUBLISH",
     "X-WR-CALNAME:Bonne Fête (France)",
     (
-        "X-WR-CALDESC:Dates annuelles des fêtes affectives en France — "
+        "X-WR-CALDESC:Dates annuelles des fêtes affectives en France : "
         "Saint-Valentin\\, fêtes des mères\\, pères\\, grands-mères\\, "
         "grands-pères\\, et Journée mondiale des grands-parents."
     ),
@@ -256,7 +256,7 @@ def _unfold(text: str) -> list[str]:
     return unfolded.split("\n")
 
 
-def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 — single-pass RFC 5545 parser; splitting would obscure block-state logic.
+def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 (single-pass RFC 5545 parser; splitting would obscure block-state logic)
     """Parse `path` and return previously-written events keyed by (celebration key, year)."""
     if not path.exists():
         return {}
@@ -325,7 +325,7 @@ def build_events(
         for year in range(celebration.start_year, end_year + 1):
             computed = celebration.rule(year)
             prev = previous.get((celebration.key, year))
-            # Past events keep their historical date — never rewrite history.
+            # Past events keep their historical date, never rewrite history.
             if prev is not None and computed < today:
                 event_date = prev.event_date
             else:
@@ -398,7 +398,7 @@ def render_next_dates_markdown(today: date) -> str:
     """Render the next occurrence of each celebration as a Markdown bullet list."""
     rows = next_occurrences(today)
     lines = [
-        f"- **{celebration.name}** — {format_english_date(d)}"
+        f"- **{celebration.name}**: {format_english_date(d)}"
         for celebration, d in rows
     ]
     return "\n".join(lines)
