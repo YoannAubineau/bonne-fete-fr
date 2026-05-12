@@ -1,0 +1,38 @@
+name: sync-rulesets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/rulesets/**'
+      - '.github/workflows/sync-rulesets.yml'
+  workflow_dispatch:
+
+permissions:
+  administration: write
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply rulesets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for file in .github/rulesets/*.json; do
+            name=$(jq -r .name "$file")
+            existing_id=$(gh api "repos/$REPO/rulesets" \
+              --jq ".[] | select(.name == \"$name\") | .id" | head -n1)
+            if [ -n "$existing_id" ]; then
+              echo "Updating ruleset '$name' (id=$existing_id) from $file"
+              gh api -X PUT "repos/$REPO/rulesets/$existing_id" --input "$file"
+            else
+              echo "Creating ruleset '$name' from $file"
+              gh api -X POST "repos/$REPO/rulesets" --input "$file"
+            fi
+          done
