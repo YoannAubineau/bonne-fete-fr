@@ -402,7 +402,7 @@ def counter_script() -> str:
 
 def write_html(today: date) -> None:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
-    gcal_url = "https://calendar.google.com/calendar/render?cid=" + quote(PUBLIC_URL, safe="")
+    gcal_url = "https://calendar.google.com/calendar/r/settings/addbyurl?url=" + quote(PUBLIC_URL, safe="")
     webcal_url = PUBLIC_URL
     for scheme in ("https://", "http://"):
         if webcal_url.startswith(scheme):
