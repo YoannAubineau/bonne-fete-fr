@@ -254,7 +254,7 @@ La page d'accueil est **un artefact généré** par `generate.py` à partir d'un
 |---|---|
 | `{{PROCHAINES_DATES}}` | HTML d'une liste de `<div class="date-row">…</div>` pour chaque fête, dans l'ordre chronologique des prochaines dates à partir d'aujourd'hui. La première (la plus proche) reçoit la classe additionnelle `featured` pour la mettre en valeur visuellement. Date formatée en français (« samedi 14 février 2026 »). |
 | `{{URL_ICS}}` | Valeur de `URL_PUBLIQUE` |
-| `{{URL_GCAL}}` | URL Google Calendar 1-clic : `https://calendar.google.com/calendar/render?cid={URL_ICS encodée}` |
+| `{{URL_GCAL}}` | URL Google Calendar 1-clic : `https://calendar.google.com/calendar/r/settings/addbyurl?url={URL_ICS encodée}` |
 | `{{URL_WEBCAL}}` | Version `webcal://` de `URL_PUBLIQUE` |
 | `{{COMPTEUR_SCRIPT}}` | Bloc `<script>` du compteur (§12), ou chaîne vide si `COMPTEUR_API = None` |
 
@@ -333,7 +333,7 @@ GitHub Pages, branche `main`, dossier racine.
 | Page d'accueil | `https://{user}.github.io/{repo}/` |
 | Fichier `.ics` | `https://{user}.github.io/{repo}/bonne-fete-fr.ics` |
 | Abonnement Apple/Outlook | `webcal://{user}.github.io/{repo}/bonne-fete-fr.ics` |
-| Abonnement Google Calendar | `https://calendar.google.com/calendar/render?cid={URL_ENCODÉE}` |
+| Abonnement Google Calendar | `https://calendar.google.com/calendar/r/settings/addbyurl?url={URL_ENCODÉE}` |
 
 GitHub Pages sert nativement les `.ics` avec le `Content-Type: text/calendar` correct. Aucune configuration supplémentaire requise.
 
