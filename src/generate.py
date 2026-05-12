@@ -12,15 +12,15 @@ from urllib.parse import quote
 
 # --- Configuration ---
 
-PUBLIC_URL = "https://yaubi.github.io/bonne-fete-fr/bonne-fete-fr.ics"
+PUBLIC_URL = "https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics"
 COUNTER_API: str | None = "https://api.counterapi.dev/v1/bonne-fete-fr/subscriptions"
 FUTURE_YEARS = 30
 MIN_START_YEAR = 1950
 FROZEN_DTSTAMP = "19500101T000000Z"
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-ICS_PATH = PROJECT_ROOT / "docs" / "bonne-fete-fr.ics"
-HTML_PATH = PROJECT_ROOT / "docs" / "index.html"
+ICS_PATH = PROJECT_ROOT / "artefacts" / "bonne-fete-fr.ics"
+HTML_PATH = PROJECT_ROOT / "artefacts" / "index.html"
 TEMPLATE_PATH = PROJECT_ROOT / "src" / "index-template.html"
 
 
