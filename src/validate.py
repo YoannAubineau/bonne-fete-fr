@@ -13,9 +13,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ICS_PATH = PROJECT_ROOT / "artefacts" / "bonne-fete-fr.ics"
 
 MAX_PROBLEMS = 20
+YEAR_MIN = 1900
+YEAR_MAX = 9999
 
 
 def _year_of(value: object) -> int | None:
+    """Return the year of `value` if it is a date or datetime, else None."""
     if isinstance(value, datetime):
         return value.year
     if isinstance(value, date_cls):
@@ -23,7 +26,8 @@ def _year_of(value: object) -> int | None:
     return None
 
 
-def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each branch reports a distinct problem.
+def main() -> int:
+    """Validate the generated .ics file. Return 0 on success, 1 on any problem."""
     if not ICS_PATH.exists():
         print(f"✗ file not found: {ICS_PATH}")
         return 1
@@ -64,11 +68,9 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each br
         else:
             uids.add(uid_str)
 
-        problems.extend(
-            f"{uid_str}: property {prop.upper()} missing"
-            for prop in ("summary", "dtstart", "dtend", "sequence", "dtstamp")
-            if component.get(prop) is None
-        )
+        for prop in ("summary", "dtstart", "dtend", "sequence", "dtstamp"):
+            if component.get(prop) is None:
+                problems.append(f"{uid_str}: property {prop.upper()} missing")
 
         dtstart = component.get("dtstart")
         dtend = component.get("dtend")
@@ -76,8 +78,8 @@ def main() -> int:  # noqa: C901, PLR0912, PLR0915 — linear validator; each br
             if not (dtend.dt > dtstart.dt):
                 problems.append(f"{uid_str}: DTEND ≤ DTSTART")
             year = _year_of(dtstart.dt)
-            if year is None or not (1900 <= year <= 9999):
-                problems.append(f"{uid_str}: year out of [1900, 9999]")
+            if year is None or not (YEAR_MIN <= year <= YEAR_MAX):
+                problems.append(f"{uid_str}: year out of [{YEAR_MIN}, {YEAR_MAX}]")
 
         seq = component.get("sequence")
         if seq is not None:

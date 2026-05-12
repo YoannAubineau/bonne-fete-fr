@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -15,8 +16,17 @@ from generate import (
     valentines_day,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
-def _case(label, fn, year, expected):
+
+def _case(
+    label: str,
+    fn: Callable[[int], date],
+    year: int,
+    expected: date,
+) -> pytest.ParameterSet:
+    """Build a parametrize entry with a stable test id."""
     return pytest.param(fn, year, expected, id=f"{label}-{year}")
 
 
@@ -25,6 +35,7 @@ CASES = [
     _case("valentines", valentines_day, 2020, date(2020, 2, 14)),
     _case("valentines", valentines_day, 2026, date(2026, 2, 14)),
     _case("valentines", valentines_day, 2100, date(2100, 2, 14)),
+
     # Grandmothers' Day.
     _case("grandmothers", grandmothers_day, 1987, date(1987, 3, 28)),  # 1st edition (Saturday)
     _case("grandmothers", grandmothers_day, 2022, date(2022, 3, 6)),
@@ -32,15 +43,17 @@ CASES = [
     _case("grandmothers", grandmothers_day, 2026, date(2026, 3, 1)),
     _case("grandmothers", grandmothers_day, 2027, date(2027, 3, 7)),
     _case("grandmothers", grandmothers_day, 2028, date(2028, 3, 5)),
+
     # Mothers' Day (includes Pentecost-shift cases).
     _case("mothers", mothers_day, 2008, date(2008, 5, 25)),
-    _case("mothers", mothers_day, 2012, date(2012, 6, 3)),  # Pentecost shift
+    _case("mothers", mothers_day, 2012, date(2012, 6, 3)),    # Pentecost shift
     _case("mothers", mothers_day, 2018, date(2018, 5, 27)),
-    _case("mothers", mothers_day, 2023, date(2023, 6, 4)),  # Pentecost shift
+    _case("mothers", mothers_day, 2023, date(2023, 6, 4)),    # Pentecost shift
     _case("mothers", mothers_day, 2025, date(2025, 5, 25)),
     _case("mothers", mothers_day, 2026, date(2026, 5, 31)),
-    _case("mothers", mothers_day, 2034, date(2034, 6, 4)),  # future Pentecost shift
-    _case("mothers", mothers_day, 2045, date(2045, 6, 4)),  # future Pentecost shift
+    _case("mothers", mothers_day, 2034, date(2034, 6, 4)),    # future Pentecost shift
+    _case("mothers", mothers_day, 2045, date(2045, 6, 4)),    # future Pentecost shift
+
     # Fathers' Day.
     _case("fathers", fathers_day, 2020, date(2020, 6, 21)),
     _case("fathers", fathers_day, 2023, date(2023, 6, 18)),
@@ -48,12 +61,14 @@ CASES = [
     _case("fathers", fathers_day, 2025, date(2025, 6, 15)),
     _case("fathers", fathers_day, 2026, date(2026, 6, 21)),
     _case("fathers", fathers_day, 2030, date(2030, 6, 16)),
+
     # World Grandparents' Day.
     _case("grandparents", grandparents_day, 2021, date(2021, 7, 25)),  # 1st edition
     _case("grandparents", grandparents_day, 2022, date(2022, 7, 24)),
     _case("grandparents", grandparents_day, 2023, date(2023, 7, 23)),
     _case("grandparents", grandparents_day, 2024, date(2024, 7, 28)),
     _case("grandparents", grandparents_day, 2025, date(2025, 7, 27)),
+
     # Grandfathers' Day.
     _case("grandfathers", grandfathers_day, 2024, date(2024, 10, 6)),
     _case("grandfathers", grandfathers_day, 2025, date(2025, 10, 5)),
@@ -64,5 +79,6 @@ CASES = [
 
 
 @pytest.mark.parametrize(("fn", "year", "expected"), CASES)
-def test_celebration_date(fn, year, expected):
+def test_celebration_date(fn: Callable[[int], date], year: int, expected: date) -> None:
+    """Check that `fn(year)` returns the pinned expected date."""
     assert fn(year) == expected

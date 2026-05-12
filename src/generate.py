@@ -28,6 +28,7 @@ README_NEXT_DATES_END = "<!-- END: next-dates -->"
 
 # --- Date helpers ---
 
+DECEMBER = 12
 
 def easter(year: int) -> date:
     """Easter Sunday via the Meeus/Jones/Butcher Gregorian computus."""
@@ -41,7 +42,7 @@ def easter(year: int) -> date:
     h = (19 * a + b - d - g + 15) % 30
     i = c // 4
     k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7  # noqa: E741 — variable names match Meeus's published formula.
+    l = (32 + 2 * e + 2 * i - h - k) % 7
     m = (a + 11 * h + 22 * l) // 451
     month = (h + l - 7 * m + 114) // 31
     day = ((h + l - 7 * m + 114) % 31) + 1
@@ -51,7 +52,10 @@ def easter(year: int) -> date:
 def nth_sunday(year: int, month: int, n: int) -> date:
     """Return the n-th Sunday of the month. n in {1, 2, 3, 4, -1 (last)}."""
     if n == -1:
-        last = date(year, 12, 31) if month == 12 else date(year, month + 1, 1) - timedelta(days=1)
+        if month == DECEMBER:
+            last = date(year, DECEMBER, 31)
+        else:
+            last = date(year, month + 1, 1) - timedelta(days=1)
         # weekday(): Monday=0, Sunday=6
         offset_back = (last.weekday() - 6) % 7
         return last - timedelta(days=offset_back)
@@ -60,24 +64,30 @@ def nth_sunday(year: int, month: int, n: int) -> date:
         offset_forward = (6 - first.weekday()) % 7
         first_sunday = first + timedelta(days=offset_forward)
         return first_sunday + timedelta(weeks=n - 1)
-    raise ValueError(f"Unsupported nth: {n}")
+    msg = f"Unsupported nth: {n}"
+    raise ValueError(msg)
 
 
 # --- Celebration rules ---
 
+GRANDMOTHERS_DAY_FIRST_YEAR = 1987
+
 
 def valentines_day(year: int) -> date:
+    """Return the Saint-Valentin date for `year` (14 February)."""
     return date(year, 2, 14)
 
 
 def grandmothers_day(year: int) -> date:
+    """Return the Fête des Grands-Mères date for `year` (1st Sunday of March; 1987 special-cased)."""
     # First edition was Saturday 28 March 1987 (last Saturday of the month).
-    if year == 1987:
+    if year == GRANDMOTHERS_DAY_FIRST_YEAR:
         return date(1987, 3, 28)
     return nth_sunday(year, 3, 1)
 
 
 def mothers_day(year: int) -> date:
+    """Return the Fête des Mères date for `year` (last Sunday of May; +1 week if Pentecost coincides)."""
     last_sunday_may = nth_sunday(year, 5, -1)
     pentecost = easter(year) + timedelta(days=49)
     if last_sunday_may == pentecost:
@@ -86,22 +96,26 @@ def mothers_day(year: int) -> date:
 
 
 def fathers_day(year: int) -> date:
+    """Return the Fête des Pères date for `year` (3rd Sunday of June)."""
     return nth_sunday(year, 6, 3)
 
 
 def grandparents_day(year: int) -> date:
+    """Return the Journée mondiale des grands-parents date for `year` (4th Sunday of July)."""
     return nth_sunday(year, 7, 4)
 
 
 def grandfathers_day(year: int) -> date:
+    """Return the Fête des Grands-Pères date for `year` (1st Sunday of October)."""
     return nth_sunday(year, 10, 1)
 
 
 # --- Celebration catalog ---
 
-
 @dataclass(frozen=True)
 class Celebration:
+    """A celebration definition: key, display name, start year, date rule, description."""
+
     # `key` is part of the immutable UID — never change it.
     key: str
     name: str
@@ -112,48 +126,27 @@ class Celebration:
 
 CELEBRATIONS: list[Celebration] = [
     Celebration(
-        "saint-valentin",
-        "Saint-Valentin",
-        1950,
-        valentines_day,
+        "saint-valentin", "Saint-Valentin", 1950, valentines_day,
         "Saint-Valentin — fête des amoureux (14 février).",
     ),
     Celebration(
-        "grands-meres",
-        "Fête des Grands-Mères",
-        1987,
-        grandmothers_day,
+        "grands-meres", "Fête des Grands-Mères", 1987, grandmothers_day,
         "Fête des Grands-Mères — 1ᵉʳ dimanche de mars.",
     ),
     Celebration(
-        "meres",
-        "Fête des Mères",
-        1950,
-        mothers_day,
-        (
-            "Fête des Mères — dernier dimanche de mai, "
-            "ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte."
-        ),
+        "meres", "Fête des Mères", 1950, mothers_day,
+        "Fête des Mères — dernier dimanche de mai, ou 1ᵉʳ dimanche de juin si coïncidence avec la Pentecôte.",
     ),
     Celebration(
-        "peres",
-        "Fête des Pères",
-        1952,
-        fathers_day,
+        "peres", "Fête des Pères", 1952, fathers_day,
         "Fête des Pères — 3ᵉ dimanche de juin.",
     ),
     Celebration(
-        "grands-parents",
-        "Journée mondiale des grands-parents",
-        2021,
-        grandparents_day,
+        "grands-parents", "Journée mondiale des grands-parents", 2021, grandparents_day,
         "Journée mondiale des grands-parents — 4ᵉ dimanche de juillet.",
     ),
     Celebration(
-        "grands-peres",
-        "Fête des Grands-Pères",
-        2008,
-        grandfathers_day,
+        "grands-peres", "Fête des Grands-Pères", 2008, grandfathers_day,
         "Fête des Grands-Pères — 1ᵉʳ dimanche d'octobre.",
     ),
 ]
@@ -181,7 +174,12 @@ CALENDAR_FOOTER = ["END:VCALENDAR"]
 
 def escape_ical_text(s: str) -> str:
     """Escape an iCalendar TEXT value (RFC 5545 §3.3.11)."""
-    return s.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+    return (
+        s.replace("\\", "\\\\")
+        .replace(";", "\\;")
+        .replace(",", "\\,")
+        .replace("\n", "\\n")
+    )
 
 
 def vevent_lines(celebration: Celebration, year: int, event_date: date, sequence: int) -> list[str]:
@@ -203,7 +201,14 @@ def vevent_lines(celebration: Celebration, year: int, event_date: date, sequence
 
 def significant_lines(lines: list[str]) -> list[str]:
     """Lines that count for change detection (everything except DTSTAMP and SEQUENCE)."""
-    return [ln for ln in lines if not ln.startswith("DTSTAMP") and not ln.startswith("SEQUENCE")]
+    return [
+        ln for ln in lines
+        if not ln.startswith("DTSTAMP") and not ln.startswith("SEQUENCE")
+    ]
+
+
+UTF8_CONTINUATION_MASK = 0xC0
+UTF8_CONTINUATION_PREFIX = 0x80
 
 
 def fold_line(line: str, max_octets: int = 75) -> str:
@@ -218,7 +223,7 @@ def fold_line(line: str, max_octets: int = 75) -> str:
         budget = max_octets if first else (max_octets - 1)
         end = min(pos + budget, len(encoded))
         # Never cut in the middle of a UTF-8 sequence.
-        while end < len(encoded) and (encoded[end] & 0xC0) == 0x80:
+        while end < len(encoded) and (encoded[end] & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_PREFIX:
             end -= 1
         chunk = encoded[pos:end]
         parts.append(chunk if first else (b" " + chunk))
@@ -229,9 +234,10 @@ def fold_line(line: str, max_octets: int = 75) -> str:
 
 # --- Read previous .ics (date preservation + SEQUENCE tracking) ---
 
-
 @dataclass
 class PreviousEvent:
+    """A previously-written event recovered from the existing .ics file."""
+
     event_date: date
     sequence: int
     significant: list[str]
@@ -244,7 +250,8 @@ def _unfold(text: str) -> list[str]:
     return unfolded.split("\n")
 
 
-def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: C901 — single-pass RFC 5545 parser; splitting would obscure block-state logic.
+def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:
+    """Parse `path` and return previously-written events keyed by (celebration key, year)."""
     if not path.exists():
         return {}
     text = path.read_text(encoding="utf-8")
@@ -267,7 +274,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: 
         dtstart_line = next((b for b in block if b.startswith("DTSTART")), None)
         if uid_line is None or dtstart_line is None:
             continue
-        uid = uid_line[len("UID:") :]
+        uid = uid_line[len("UID:"):]
         if not uid.endswith("@bonne-fete-fr"):
             continue
         base = uid[: -len("@bonne-fete-fr")]
@@ -276,7 +283,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: 
             continue
         key = base[:sep]
         try:
-            year = int(base[sep + 1 :])
+            year = int(base[sep + 1:])
         except ValueError:
             continue
         dt_value = dtstart_line.split(":", 1)[1]
@@ -288,7 +295,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: 
         seq = 0
         if seq_line is not None:
             try:
-                seq = int(seq_line[len("SEQUENCE:") :])
+                seq = int(seq_line[len("SEQUENCE:"):])
             except ValueError:
                 seq = 0
         previous[(key, year)] = PreviousEvent(
@@ -301,10 +308,7 @@ def read_previous(path: Path) -> dict[tuple[str, int], PreviousEvent]:  # noqa: 
 
 # --- Build VEVENTs ---
 
-
-def build_events(
-    today: date, previous: dict[tuple[str, int], PreviousEvent]
-) -> list[tuple[date, list[str]]]:
+def build_events(today: date, previous: dict[tuple[str, int], PreviousEvent]) -> list[tuple[date, list[str]]]:
     """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
@@ -313,7 +317,10 @@ def build_events(
             computed = celebration.rule(year)
             prev = previous.get((celebration.key, year))
             # Past events keep their historical date — never rewrite history.
-            event_date = prev.event_date if prev is not None and computed < today else computed
+            if prev is not None and computed < today:
+                event_date = prev.event_date
+            else:
+                event_date = computed
             candidate = vevent_lines(celebration, year, event_date, sequence=0)
             candidate_sig = significant_lines(candidate)
             if prev is None:
@@ -329,6 +336,7 @@ def build_events(
 
 
 def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
+    """Serialize the calendar header, events, and footer to RFC 5545 bytes."""
     all_lines: list[str] = []
     all_lines.extend(CALENDAR_HEADER)
     for _, ev_lines in events:
@@ -340,6 +348,7 @@ def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
 
 
 def write_ics(today: date) -> int:
+    """Write the .ics file using `today` as the cutoff for historical preservation. Return event count."""
     previous = read_previous(ICS_PATH)
     events = build_events(today, previous)
     ICS_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -348,31 +357,16 @@ def write_ics(today: date) -> int:
 
 
 EN_WEEKDAYS = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
 ]
 EN_MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
 ]
 
 
 def format_english_date(d: date) -> str:
+    """Format `d` as e.g. `Sunday, June 1, 2025`."""
     return f"{EN_WEEKDAYS[d.weekday()]}, {EN_MONTHS[d.month - 1]} {d.day}, {d.year}"
 
 
@@ -392,12 +386,17 @@ def next_occurrences(today: date) -> list[tuple[Celebration, date]]:
 
 
 def render_next_dates_markdown(today: date) -> str:
+    """Render the next occurrence of each celebration as a Markdown bullet list."""
     rows = next_occurrences(today)
-    lines = [f"- **{celebration.name}** — {format_english_date(d)}" for celebration, d in rows]
+    lines = [
+        f"- **{celebration.name}** — {format_english_date(d)}"
+        for celebration, d in rows
+    ]
     return "\n".join(lines)
 
 
 def write_readme(today: date) -> None:
+    """Refresh the next-dates block of the README in place."""
     text = README_PATH.read_text(encoding="utf-8")
     begin = text.index(README_NEXT_DATES_BEGIN) + len(README_NEXT_DATES_BEGIN)
     end = text.index(README_NEXT_DATES_END, begin)
@@ -406,6 +405,7 @@ def write_readme(today: date) -> None:
 
 
 def main() -> int:
+    """Generate the .ics calendar and refresh the README."""
     today = datetime.now(tz=ZoneInfo("Europe/Paris")).date()
     n = write_ics(today)
     write_readme(today)
