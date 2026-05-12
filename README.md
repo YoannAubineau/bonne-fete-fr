@@ -1,5 +1,8 @@
 # Bonne Fête !
 
+[![update-calendar](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml/badge.svg)](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml)
+![Calendar updated](https://img.shields.io/github/last-commit/YoannAubineau/bonne-fete-fr?path=artefacts%2Fbonne-fete-fr.ics&label=calendar%20updated&color=b6383b)
+
 A free public iCalendar (`.ics`) feed for the six affective celebrations observed in France: *Saint-Valentin*, *Fête des Mères*, *Fête des Pères*, *Fête des Grands-Mères*, *Fête des Grands-Pères*, and *Journée mondiale des grands-parents*. Each year's dates are computed from the legal and conventional rules (including the *Pentecôte* exception for *Fête des Mères*) and can be added to Google Calendar, Apple Calendar, or Outlook in a single click.
 
 ## Next dates
@@ -18,7 +21,7 @@ A free public iCalendar (`.ics`) feed for the six affective celebrations observe
 Once added, the dates appear in your calendar automatically, every year.
 
 - [Google Calendar (one click)](https://calendar.google.com/calendar/r/settings/addbyurl?url=https%3A%2F%2Fyoannaubineau.github.io%2Fbonne-fete-fr%2Fbonne-fete-fr.ics)
-- [Apple Calendar / Outlook (webcal://)](webcal://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics)
+- Apple Calendar / Outlook — subscribe to `webcal://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics`
 - [Download the .ics](https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics)
 
 Subscription URL: `https://yoannaubineau.github.io/bonne-fete-fr/bonne-fete-fr.ics`

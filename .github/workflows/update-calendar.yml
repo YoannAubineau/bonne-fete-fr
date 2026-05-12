@@ -44,7 +44,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add artefacts/bonne-fete-fr.ics artefacts/index.html README.md
+          git add artefacts/bonne-fete-fr.ics README.md
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
