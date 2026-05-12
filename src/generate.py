@@ -22,6 +22,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ICS_PATH = PROJECT_ROOT / "artefacts" / "bonne-fete-fr.ics"
 HTML_PATH = PROJECT_ROOT / "artefacts" / "index.html"
 TEMPLATE_PATH = PROJECT_ROOT / "src" / "index-template.html"
+README_PATH = PROJECT_ROOT / "README.md"
+README_NEXT_DATES_BEGIN = "<!-- BEGIN: next-dates -->"
+README_NEXT_DATES_END = "<!-- END: next-dates -->"
 
 
 # --- Date helpers ---
@@ -341,9 +344,21 @@ FR_MONTHS = [
     "juillet", "août", "septembre", "octobre", "novembre", "décembre",
 ]
 
+EN_WEEKDAYS = [
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+]
+EN_MONTHS = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+]
+
 
 def format_french_date(d: date) -> str:
     return f"{FR_WEEKDAYS[d.weekday()]} {d.day} {FR_MONTHS[d.month - 1]} {d.year}"
+
+
+def format_english_date(d: date) -> str:
+    return f"{EN_WEEKDAYS[d.weekday()]}, {EN_MONTHS[d.month - 1]} {d.day}, {d.year}"
 
 
 def next_occurrences(today: date) -> list[tuple[Holiday, date]]:
@@ -373,6 +388,15 @@ def render_next_dates_html(today: date) -> str:
             f"</div>"
         )
     return "\n".join(pieces)
+
+
+def render_next_dates_markdown(today: date) -> str:
+    rows = next_occurrences(today)
+    lines = [
+        f"- **{holiday.name}** — {format_english_date(d)}"
+        for holiday, d in rows
+    ]
+    return "\n".join(lines)
 
 
 def counter_script() -> str:
@@ -420,12 +444,22 @@ def write_html(today: date) -> None:
     HTML_PATH.write_text(html, encoding="utf-8")
 
 
+def write_readme(today: date) -> None:
+    text = README_PATH.read_text(encoding="utf-8")
+    begin = text.index(README_NEXT_DATES_BEGIN) + len(README_NEXT_DATES_BEGIN)
+    end = text.index(README_NEXT_DATES_END, begin)
+    new_block = "\n" + render_next_dates_markdown(today) + "\n"
+    README_PATH.write_text(text[:begin] + new_block + text[end:], encoding="utf-8")
+
+
 def main() -> int:
     today = date.today()
     n = write_ics(today)
     write_html(today)
+    write_readme(today)
     print(f"✓ wrote {n} VEVENT to {ICS_PATH.relative_to(PROJECT_ROOT)}")
     print(f"✓ wrote landing page to {HTML_PATH.relative_to(PROJECT_ROOT)}")
+    print(f"✓ updated README at {README_PATH.relative_to(PROJECT_ROOT)}")
     return 0
 
 
