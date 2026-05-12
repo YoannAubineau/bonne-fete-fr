@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bonne Fête — Calendrier des fêtes affectives en France</title>
+<meta name="description" content="Calendrier iCal gratuit des fêtes affectives en France : Saint-Valentin, mères, pères, grands-mères, grands-pères, grands-parents. À ajouter en un clic à votre agenda.">
+<meta property="og:title" content="Bonne Fête — Calendrier des fêtes affectives en France">
+<meta property="og:description" content="Calendrier iCal des fêtes affectives en France, à ajouter à votre agenda en un clic.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf6ee;
+    --ink: #2b211a;
+    --accent: #b6383b;
+    --accent-soft: #f3d8d4;
+    --muted: #6b5b50;
+    --card: #ffffff;
+    --shadow: 0 6px 20px rgba(78, 51, 38, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    line-height: 1.15;
+    margin: 0 0 0.4em;
+    color: var(--ink);
+  }
+  h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 2.2rem 0 0.8rem;
+    color: var(--accent);
+  }
+  .lede {
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin: 0 0 1.4rem;
+  }
+  .next-dates { margin: 1.4rem 0 2rem; }
+  .date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 16px;
+    background: var(--card);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: var(--shadow);
+  }
+  .date-row.featured {
+    background: var(--accent-soft);
+    box-shadow: 0 8px 24px rgba(182, 56, 59, 0.18);
+  }
+  .holiday-name {
+    font-weight: 500;
+  }
+  .holiday-date {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .date-row.featured .holiday-date {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0.6rem 0 0.8rem;
+  }
+  .subscribe-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    transition: transform 80ms ease;
+  }
+  .subscribe-btn:hover { transform: translateY(-1px); }
+  .subscribe-btn.primary {
+    background: var(--accent);
+    color: white;
+  }
+  .raw-url {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0.6rem 0;
+    word-break: break-all;
+  }
+  .raw-url code {
+    background: var(--card);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+  #subscription-counter {
+    color: var(--accent);
+    font-size: 0.95rem;
+    margin: 0.6rem 0 0;
+    min-height: 1.2em;
+  }
+  .why p { margin: 0.6rem 0; }
+  em { color: var(--accent); font-style: italic; }
+  footer {
+    margin-top: 2.6rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Calendrier des fêtes affectives en France</h1>
+  <p class="lede">Saint-Valentin, fêtes des mères, des pères, des grands-mères, des grands-pères, et journée mondiale des grands-parents — calculées chaque année selon les règles légales et conventionnelles, à ajouter à votre agenda en un clic.</p>
+
+  <section class="next-dates">
+    <h2>Prochaines dates</h2>
+{{NEXT_DATES}}
+  </section>
+
+  <section class="subscribe">
+    <h2>S'abonner</h2>
+    <p>Une fois ajouté, les dates s'inscrivent automatiquement dans votre agenda, chaque année.</p>
+    <div class="buttons">
+      <a href="{{GCAL_URL}}" class="subscribe-btn primary">Google Calendar</a>
+      <a href="{{WEBCAL_URL}}" class="subscribe-btn">Apple Calendar / Outlook</a>
+      <a href="{{ICS_URL}}" class="subscribe-btn" download>Télécharger le .ics</a>
+    </div>
+    <p class="raw-url">URL d'abonnement : <code>{{ICS_URL}}</code></p>
+    <p id="subscription-counter"></p>
+  </section>
+
+  <section class="why">
+    <h2>Pourquoi ?</h2>
+    <p>Les fêtes affectives en France obéissent à des règles précises mais déroutantes. La fête des Mères est le dernier dimanche de mai, <em>sauf</em> quand il coïncide avec la Pentecôte — auquel cas elle bascule au premier dimanche de juin (2023, 2034, 2045…). La toute première fête des Grands-Mères a été célébrée le samedi 28 mars 1987, avant que la fête ne se cale sur le premier dimanche de mars.</p>
+    <p>Ce calendrier suit ces règles à la lettre, sanctuarise les dates historiques telles qu'elles ont été célébrées, et s'étend automatiquement d'une année supplémentaire chaque 1ᵉʳ janvier.</p>
+  </section>
+
+  <footer>
+    <p><a href="https://github.com/yaubi/bonne-fete-fr">Code source</a> · Calendrier généré automatiquement · Domaine public</p>
+  </footer>
+</main>
+
+{{COUNTER_SCRIPT}}
+</body>
+</html>

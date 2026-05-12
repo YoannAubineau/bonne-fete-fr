@@ -1,0 +1,20 @@
+[project]
+name = "bonne-fete-fr"
+version = "0.1.0"
+description = "Public iCalendar feed for the French affective holidays"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+dependencies = [
+    "icalendar>=6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["src"]
+python_files = ["tests.py", "test_*.py"]
+pythonpath = ["src"]
