@@ -316,7 +316,12 @@ def build_events(
     today: date,
     previous: dict[tuple[str, int], PreviousEvent],
 ) -> list[tuple[date, list[str]]]:
-    """Return (date, vevent_lines) tuples sorted chronologically by DTSTART."""
+    """Return (date, vevent_lines) tuples ordered future first, then past.
+
+    Future events (DTSTART >= today) come first in ascending order, so the
+    event whose date equals `today` sits at the top of the file. Past events
+    (DTSTART < today) follow in descending order, down to 1950 at the bottom.
+    """
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
     for observance in OBSERVANCES:
@@ -338,8 +343,9 @@ def build_events(
                 sequence = prev.sequence + 1
             final = vevent_lines(observance, year, event_date, sequence=sequence)
             events.append((event_date, final))
-    events.sort(key=lambda x: x[0])
-    return events
+    future = sorted((e for e in events if e[0] >= today), key=lambda x: x[0])
+    past = sorted((e for e in events if e[0] < today), key=lambda x: x[0], reverse=True)
+    return future + past
 
 
 def serialize_calendar(events: list[tuple[date, list[str]]]) -> bytes:
