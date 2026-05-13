@@ -26,7 +26,7 @@ addopts = ["--cov=src", "--cov-report=term-missing", "--cov-branch"]
 [tool.coverage.run]
 source = ["src"]
 branch = true
-omit = ["src/tests.py"]
+omit = ["src/tests.py", "src/test_*.py"]
 
 [tool.coverage.report]
 show_missing = true
@@ -60,6 +60,13 @@ ignore = [
 "src/tests.py" = [
     "S101",   # use of `assert` (intrinsic to pytest)
     "INP001", # implicit namespace package (tests.py is a script)
+]
+"src/test_*.py" = [
+    "S101",    # use of `assert` (intrinsic to pytest)
+    "INP001",  # implicit namespace package (test files are scripts)
+    "PLR2004", # magic value comparison (intrinsic to literal-expected assertions)
+    "PLR0913", # too many arguments (test builders take one kwarg per overridable field)
+    "SLF001",  # private member access (tests may exercise `_unfold` and `_year_of`)
 ]
 
 [tool.ruff.format]
