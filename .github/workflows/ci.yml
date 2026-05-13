@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   lint-and-test:
@@ -41,3 +41,46 @@ jobs:
             sed -n '/tests coverage/,/^===/p' /tmp/pytest.out
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update README coverage badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          pct=$(uv run coverage report --format=total)
+          if   [ "$pct" -ge 90 ]; then color=brightgreen
+          elif [ "$pct" -ge 80 ]; then color=green
+          elif [ "$pct" -ge 70 ]; then color=yellowgreen
+          elif [ "$pct" -ge 60 ]; then color=yellow
+          elif [ "$pct" -ge 50 ]; then color=orange
+          else                         color=red
+          fi
+          url="https://img.shields.io/badge/coverage-${pct}%25-${color}"
+          uv run python - "$url" <<'PY'
+          import pathlib
+          import re
+          import sys
+
+          url = sys.argv[1]
+          path = pathlib.Path("README.md")
+          text = path.read_text()
+          updated = re.sub(
+              r"(<!-- BEGIN: coverage-badge -->\n).*(\n<!-- END: coverage-badge -->)",
+              rf"\1![coverage]({url})\2",
+              text,
+              count=1,
+              flags=re.DOTALL,
+          )
+          path.write_text(updated)
+          PY
+
+      - name: Commit README badge change if any
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --staged --quiet; then
+            echo "No badge change to commit."
+          else
+            git commit -m "automatic coverage badge update"
+            git push
+          fi
