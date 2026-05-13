@@ -160,7 +160,7 @@ bonne-fete-fr/
 ├── .github/
 │   └── workflows/
 │       ├── update-calendar.yml      # régénération mensuelle + tests + validation + commit
-│       └── annual-rules-review.yml  # ouvre une issue de vérification chaque janvier
+│       └── annual-review.yml        # ouvre une issue de vérification chaque janvier
 ├── artefacts/
 │   └── bonne-fete-fr.ics            # calendrier produit (artefact, committé)
 ├── src/
@@ -259,7 +259,7 @@ Régénération mensuelle.
 
 **Justification du cron mensuel plutôt qu'annuel** : un run mensuel reste un no-op 11 mois sur 12 (le `.ics` ne change pas si l'année n'a pas changé). Mais si un run échoue ou est sauté (incidents GitHub, etc.), il sera rattrapé le mois suivant. Robuste sans coût.
 
-### 9.2 Workflow `annual-rules-review.yml`
+### 9.2 Workflow `annual-review.yml`
 
 Vérification annuelle de la pérennité des règles.
 
