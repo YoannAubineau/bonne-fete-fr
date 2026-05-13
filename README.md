@@ -6,7 +6,7 @@
 
 A free public iCalendar (`.ics`) feed for the six relational observances observed in France: *Saint-Valentin*, *Fête des Mères*, *Fête des Pères*, *Fête des Grands-Mères*, *Fête des Grands-Pères*, and *Journée mondiale des grands-parents*.
 
-Each year's dates are computed from the legal and conventional rules (including the *Pentecôte* exception for *Fête des Mères*) and can be added to Google Calendar, Apple Calendar, or Outlook in a single click.
+Each year's dates are computed from the legal and conventional rules (including the *Pentecôte* exception for *Fête des Mères*) and can be added to Google Calendar, Apple Calendar, Outlook, or any calendar application you prefer.
 
 ## Next dates (auto-updated)
 
