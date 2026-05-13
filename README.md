@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/ci.yml/badge.svg)](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/ci.yml)
 <!-- BEGIN: coverage-badge -->
-![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey)
+![coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
 <!-- END: coverage-badge -->
 [![update-calendar](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml/badge.svg)](https://github.com/YoannAubineau/bonne-fete-fr/actions/workflows/update-calendar.yml)
 ![Calendar updated](https://img.shields.io/github/last-commit/YoannAubineau/bonne-fete-fr?path=artefacts%2Fbonne-fete-fr.ics&label=calendar%20updated&color=007ec6)
