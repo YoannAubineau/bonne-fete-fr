@@ -25,5 +25,8 @@ jobs:
       - name: Ruff lint
         run: uv run ruff check src/
 
+      - name: Pyright type-check
+        run: uv run pyright src/
+
       - name: Run tests
         run: uv run pytest

@@ -1,4 +1,8 @@
 """Pinned regression tests for the date-computation rules."""
+# pyright: basic, reportAttributeAccessIssue=false
+# Test scaffolding relies on pytest internals that pytest does not re-export
+# cleanly in its public type stubs (e.g. ParameterSet); strict mode is not
+# the right tradeoff for this file.
 
 from datetime import date
 from typing import TYPE_CHECKING
