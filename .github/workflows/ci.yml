@@ -29,4 +29,15 @@ jobs:
         run: uv run pyright src/
 
       - name: Run tests
-        run: uv run pytest
+        run: uv run pytest | tee /tmp/pytest.out
+
+      - name: Publish coverage to job summary
+        if: always()
+        run: |
+          {
+            echo '## Test coverage'
+            echo ''
+            echo '```'
+            sed -n '/tests coverage/,/^===/p' /tmp/pytest.out
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
