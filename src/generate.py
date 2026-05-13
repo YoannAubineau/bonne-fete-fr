@@ -316,10 +316,11 @@ def build_events(
     today: date,
     previous: dict[tuple[str, int], PreviousEvent],
 ) -> list[tuple[date, list[str]]]:
-    """Return (date, vevent_lines) tuples ordered with future events first
-    (ascending by DTSTART) followed by past events (descending by DTSTART).
-    The event whose date equals `today` is treated as future and sits at the
-    top of the file.
+    """Return (date, vevent_lines) tuples ordered future first, then past.
+
+    Future events (DTSTART >= today) come first in ascending order, so the
+    event whose date equals `today` sits at the top of the file. Past events
+    (DTSTART < today) follow in descending order, down to 1950 at the bottom.
     """
     end_year = today.year + FUTURE_YEARS
     events: list[tuple[date, list[str]]] = []
