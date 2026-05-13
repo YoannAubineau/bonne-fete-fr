@@ -62,13 +62,14 @@ jobs:
           url = sys.argv[1]
           path = pathlib.Path("README.md")
           text = path.read_text()
-          updated = re.sub(
-              r"(<!-- BEGIN: coverage-badge -->\n).*(\n<!-- END: coverage-badge -->)",
-              rf"\1![coverage]({url})\2",
+          updated, count = re.subn(
+              r"!\[coverage\]\(https://img\.shields\.io/badge/coverage-[^)]*\)",
+              f"![coverage]({url})",
               text,
               count=1,
-              flags=re.DOTALL,
           )
+          if count != 1:
+              raise SystemExit("coverage badge not found in README.md")
           path.write_text(updated)
           PY
 
