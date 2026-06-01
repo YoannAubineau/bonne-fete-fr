@@ -12,12 +12,12 @@ Each year's dates are computed from the legal and conventional rules (including 
 ## Next dates (auto-updated)
 
 <!-- BEGIN: next-dates -->
-- **Fête des Mères**: Sunday, May 31, 2026
 - **Fête des Pères**: Sunday, June 21, 2026
 - **Journée mondiale des grands-parents**: Sunday, July 26, 2026
 - **Fête des Grands-Pères**: Sunday, October 4, 2026
 - **Saint-Valentin**: Sunday, February 14, 2027
 - **Fête des Grands-Mères**: Sunday, March 7, 2027
+- **Fête des Mères**: Sunday, May 30, 2027
 <!-- END: next-dates -->
 
 ## Subscribe

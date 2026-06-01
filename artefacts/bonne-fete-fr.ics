@@ -9,17 +9,6 @@ X-WR-CALDESC:Dates annuelles des fêtes relationnelles en France : Saint-Va
  ournée mondiale des grands-parents.
 X-WR-TIMEZONE:Europe/Paris
 BEGIN:VEVENT
-UID:meres-2026@bonne-fete-fr
-DTSTAMP:19500101T000000Z
-SEQUENCE:1
-DTSTART;VALUE=DATE:20260531
-DTEND;VALUE=DATE:20260601
-SUMMARY:Fête des Mères
-DESCRIPTION:Fête des Mères : dernier dimanche de mai\, ou 1ᵉʳ dimanche
-  de juin si coïncidence avec la Pentecôte.
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:peres-2026@bonne-fete-fr
 DTSTAMP:19500101T000000Z
 SEQUENCE:1
@@ -1908,6 +1897,17 @@ DTSTART;VALUE=DATE:20561001
 DTEND;VALUE=DATE:20561002
 SUMMARY:Fête des Grands-Pères
 DESCRIPTION:Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:meres-2026@bonne-fete-fr
+DTSTAMP:19500101T000000Z
+SEQUENCE:1
+DTSTART;VALUE=DATE:20260531
+DTEND;VALUE=DATE:20260601
+SUMMARY:Fête des Mères
+DESCRIPTION:Fête des Mères : dernier dimanche de mai\, ou 1ᵉʳ dimanche
+  de juin si coïncidence avec la Pentecôte.
 TRANSP:TRANSPARENT
 END:VEVENT
 BEGIN:VEVENT
