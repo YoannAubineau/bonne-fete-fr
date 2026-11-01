@@ -9,16 +9,6 @@ X-WR-CALDESC:Dates annuelles des fêtes relationnelles en France : Saint-Va
  ournée mondiale des grands-parents.
 X-WR-TIMEZONE:Europe/Paris
 BEGIN:VEVENT
-UID:grands-peres-2026@bonne-fete-fr
-DTSTAMP:19500101T000000Z
-SEQUENCE:1
-DTSTART;VALUE=DATE:20261004
-DTEND;VALUE=DATE:20261005
-SUMMARY:Fête des Grands-Pères
-DESCRIPTION:Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.
-TRANSP:TRANSPARENT
-END:VEVENT
-BEGIN:VEVENT
 UID:saint-valentin-2027@bonne-fete-fr
 DTSTAMP:19500101T000000Z
 SEQUENCE:1
@@ -1874,6 +1864,16 @@ DTSTAMP:19500101T000000Z
 SEQUENCE:1
 DTSTART;VALUE=DATE:20561001
 DTEND;VALUE=DATE:20561002
+SUMMARY:Fête des Grands-Pères
+DESCRIPTION:Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+UID:grands-peres-2026@bonne-fete-fr
+DTSTAMP:19500101T000000Z
+SEQUENCE:1
+DTSTART;VALUE=DATE:20261004
+DTEND;VALUE=DATE:20261005
 SUMMARY:Fête des Grands-Pères
 DESCRIPTION:Fête des Grands-Pères : 1ᵉʳ dimanche d'octobre.
 TRANSP:TRANSPARENT
